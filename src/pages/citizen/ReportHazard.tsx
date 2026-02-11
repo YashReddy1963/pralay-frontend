@@ -83,7 +83,8 @@ const ReportHazard = () => {
           headers: {
             'User-Agent': 'OceanWatch-Sentinel/1.0',
             'Accept': 'application/json',
-          }
+          },
+          credentials: "include",
         });
         const data = await response.json();
         
@@ -128,7 +129,8 @@ const ReportHazard = () => {
         const response = await fetch(services[1], {
           headers: {
             'Accept': 'application/json',
-          }
+          },
+          credentials: "include",
         });
         const data = await response.json();
         
@@ -162,7 +164,8 @@ const ReportHazard = () => {
         const response = await fetch(services[2], {
           headers: {
             'Accept': 'application/json',
-          }
+          },
+          credentials: "include",
         });
         const data = await response.json();
         
