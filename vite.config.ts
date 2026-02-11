@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       '/api': {
-        target: 'https://pralay-frontend.vercel.app', // Correct Django backend port
+        target: 'https://pralay-backend-1.onrender.com', // Correct Django backend port
         changeOrigin: true,
         secure: false,
       },
