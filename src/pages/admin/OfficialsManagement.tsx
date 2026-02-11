@@ -306,7 +306,7 @@ const OfficialsManagement = () => {
       const csrfToken = await apiService.fetchCsrfToken();
       
       // Use direct fetch for FormData with proper session handling
-      const response = await fetch('http://localhost:8000/api/create-authority/', {
+      const response = await fetch('https://pralay-frontend.vercel.app/api/create-authority/', {
         method: 'POST',
         body: submitData,
         credentials: 'include',

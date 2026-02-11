@@ -820,7 +820,7 @@ const ReportHazard = () => {
       verificationData.append('description', formData.description || '');
       
       // Call AI verification service (using Django backend)
-      const response = await fetch('http://localhost:8000/api/verify-image/', {
+      const response = await fetch('https://pralay-frontend.vercel.app/api/verify-image/', {
         method: 'POST',
         body: verificationData,
       });
@@ -1747,7 +1747,7 @@ const ReportHazard = () => {
       verificationData.append('hazard_type', formData.type || 'other');
       verificationData.append('description', formData.description || '');
       
-      const response = await fetch('http://localhost:8000/api/verify-video/', {
+      const response = await fetch('https://pralay-frontend.vercel.app/api/verify-video/', {
         method: 'POST',
         body: verificationData,
         // Add timeout for reasonable processing time
@@ -2073,7 +2073,7 @@ const ReportHazard = () => {
       });
       
       // Submit to backend
-      const response = await fetch('http://localhost:8000/api/submit-hazard-report/', {
+      const response = await fetch('https://pralay-frontend.vercel.app/api/submit-hazard-report/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -23,8 +23,8 @@ export const initializeApiService = () => {
     return envBackendURL;
   }
   
-  console.log('🔗 Using default backend URL: http://localhost:8000');
-  return 'http://localhost:8000';
+  console.log('🔗 Using default backend URL: https://pralay-frontend.vercel.app');
+  return 'https://pralay-frontend.vercel.app';
 };
 
 // Get current backend URL

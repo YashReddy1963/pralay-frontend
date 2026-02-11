@@ -23,7 +23,7 @@ const getBackendURL = () => {
   }
   
   // Fallback to environment variable or default
-  return import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+  return import.meta.env.VITE_BACKEND_URL || 'https://pralay-frontend.vercel.app';
 };
 
 const API_BASE_URL = getBackendURL();
