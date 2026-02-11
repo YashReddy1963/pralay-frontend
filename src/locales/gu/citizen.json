@@ -1,0 +1,52 @@
+{
+  "title": "સમુદ્ર રિપોર્ટર",
+  "reportHazard": {
+    "title": "ખતરો રિપોર્ટ કરો",
+    "location": "સ્થાન",
+    "description": "વર્ણન",
+    "imageUpload": "ઇમેજ અપલોડ કરો",
+    "submitReport": "રિપોર્ટ સબમિટ કરો"
+  },
+  "history": {
+    "title": "રિપોર્ટ ઇતિહાસ",
+    "noReports": "કોઈ રિપોર્ટ્સ મળ્યા નથી.",
+    "searchPlaceholder": "તમારા રિપોર્ટ્સ શોધો...",
+    "totalReports": "કુલ રિપોર્ટ્સ",
+    "verified": "ચકાસાયેલ",
+    "pendingSync": "પેન્ડિંગ સિંક",
+    "viewDetails": "વિગતો જુઓ"
+  },
+  "settings": {
+    "title": "નાગરિક સેટિંગ્સ",
+    "subtitle": "તમારી પસંદગીઓ અને એકાઉન્ટ સેટિંગ્સ મેનેજ કરો",
+    "appearance": "દેખાવ",
+    "darkMode": "ડાર્ક મોડ",
+    "darkModeDesc": "નાગરિક પોર્ટલ પર ડાર્ક થીમ લાગુ કરો",
+    "language": "ભાષા",
+    "displayLanguage": "ડિસ્પ્લે ભાષા",
+    "notifications": "સૂચનાઓ",
+    "emailPushNotifications": "ઇમેઇલ અને પુશ સૂચનાઓ",
+    "emailPushNotificationsDesc": "તમારા રિપોર્ટ સ્ટેટસ વિશે અપડેટ્સ મેળવો",
+    "dataSync": "ડેટા અને સિંક",
+    "autoSync": "ઓટો સિંક",
+    "autoSyncDesc": "તમારા રિપોર્ટ ડેટાને ઓટો સિંક કરો",
+    "exportData": "ડેટા એક્સપોર્ટ કરો",
+    "clearLocalCache": "લોકલ કેશ ક્લિયર કરો",
+    "about": "વિશે",
+    "version": "વર્ઝન",
+    "role": "ભૂમિકા",
+    "location": "સ્થાન",
+    "autoLocation": "ઓટો લોકેશન",
+    "autoLocationDesc": "ખતરા રિપોર્ટ કરતી વખતે તમારા સ્થાનને ઓટો ડિટેક્ટ કરો",
+    "media": "મીડિયા",
+    "highQualityImages": "હાઈ ક્વોલિટી ઇમેજ્સ",
+    "highQualityImagesDesc": "હાઈ રિઝોલ્યુશનમાં ઇમેજ્સ અપલોડ કરો (વધુ ડેટા વાપરે છે)",
+    "dataManagement": "ડેટા મેનેજમેન્ટ",
+    "clearOfflineData": "ઓફલાઇન ડેટા ક્લિયર કરો",
+    "dataExported": "ડેટા એક્સપોર્ટ થયો",
+    "dataExportedDesc": "તમારો રિપોર્ટ ડેટા ડાઉનલોડ થયો છે.",
+    "offlineDataCleared": "ઓફલાઇન ડેટા ક્લિયર થયો",
+    "offlineDataClearedDesc": "બધા લોકલી સ્ટોર કરેલા રિપોર્ટ્સ દૂર કરી દેવાયા છે.",
+    "preferencesSaved": "તમારી પસંદગીઓ સેવ થઈ છે."
+  }
+}

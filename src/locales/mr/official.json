@@ -1,0 +1,64 @@
+{
+  "title": "महासागर डॅशबोर्ड",
+  "subtitle": "अधिकृत पोर्टल",
+  "hazardMap": {
+    "title": "धोका नकाशा",
+    "subtitle": "अहवाल केलेल्या धोक्यांचा वास्तविक वेळेचा आढावा",
+    "totalReports": "एकूण अहवाल",
+    "verified": "सत्यापित",
+    "pending": "प्रलंबित",
+    "highPriority": "उच्च प्राधान्य",
+    "filters": "फिल्टर्स",
+    "searchLocation": "स्थान किंवा धोका प्रकार शोधा...",
+    "allHazards": "सर्व धोके",
+    "allStatus": "सर्व स्थिती",
+    "dateRange": "तारीख श्रेणी",
+    "last24Hours": "शेवटचे 24 तास",
+    "last7Days": "शेवटचे 7 दिवस",
+    "last30Days": "शेवटचे 30 दिवस",
+    "last90Days": "शेवटचे 90 दिवस",
+    "legend": "कथा",
+    "relatedPosts": "संबंधित पोस्ट",
+    "images": "प्रतिमा"
+  },
+  "settings": {
+    "title": "डॅशबोर्ड सेटिंग्ज",
+    "subtitle": "अधिकाऱ्यांसाठी भाषा आणि प्राधान्ये कॉन्फिगर करा",
+    "appearance": "देखावा",
+    "darkMode": "डार्क मोड",
+    "darkModeDesc": "अधिकृत डॅशबोर्डवर डार्क थीम लागू करा",
+    "language": "भाषा",
+    "displayLanguage": "प्रदर्शन भाषा",
+    "notifications": "सूचना",
+    "emailPushNotifications": "ईमेल आणि पुश सूचना",
+    "emailPushNotificationsDesc": "नवीन अहवाल आणि नियुक्तीबद्दल अपडेट मिळवा",
+    "dataSync": "डेटा आणि सिंक",
+    "autoSync": "स्वयंचलित सिंक",
+    "autoSyncDesc": "डॅशबोर्ड डेटा स्वयंचलित रिफ्रेश करा",
+    "exportData": "डेटा एक्सपोर्ट करा",
+    "clearLocalCache": "स्थानिक कॅश साफ करा",
+    "about": "बद्दल",
+    "version": "आवृत्ती",
+    "role": "भूमिका"
+  },
+  "analytics": {
+    "weeklyTrends": "साप्ताहिक अहवाल प्रवृत्ती",
+    "hazardDistribution": "धोका प्रकारांचे वितरण",
+    "citizenParticipation": "नागरिक सहभाग (अहवाल बनाम सत्यापित)",
+    "highActivityLocations": "उच्च क्रियाकलाप स्थाने",
+    "performanceInsights": "कामगिरी अंतर्दृष्टी",
+    "recommendations": "शिफारसी",
+    "avgResponseTime": "सरासरी प्रतिसाद वेळ",
+    "criticalIncidents": "गंभीर घटना"
+  },
+  "reports": {
+    "advancedFilters": "प्रगत फिल्टर्स",
+    "pendingReview": "पुनरावलोकन प्रलंबित"
+  },
+  "social": {
+    "trendingAnalysis": "ट्रेंडिंग विश्लेषण",
+    "totalPosts": "एकूण पोस्ट",
+    "relevant": "संबंधित",
+    "underReview": "पुनरावलोकनाखाली"
+  }
+}

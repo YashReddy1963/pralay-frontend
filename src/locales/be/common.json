@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "signIn": "সাইন ইন",
+    "signUp": "সাইন আপ",
+    "dashboard": "ড্যাশবোর্ড",
+    "reports": "রিপোর্ট",
+    "analytics": "বিশ্লেষণ",
+    "settings": "সেটিংস",
+    "history": "ইতিহাস",
+    "admin": "অ্যাডমিন",
+    "socialFeed": "সোশ্যাল ফিড"
+  },
+  "common": {
+    "loading": "লোড হচ্ছে...",
+    "error": "ত্রুটি",
+    "success": "সফল",
+    "save": "সংরক্ষণ",
+    "cancel": "বাতিল",
+    "delete": "মুছে ফেলুন",
+    "edit": "সম্পাদনা",
+    "view": "দেখুন",
+    "close": "বন্ধ",
+    "back": "পিছনে",
+    "next": "পরবর্তী",
+    "previous": "পূর্ববর্তী",
+    "search": "অনুসন্ধান",
+    "filter": "ফিল্টার",
+    "export": "রপ্তানি",
+    "download": "ডাউনলোড",
+    "upload": "আপলোড",
+    "submit": "জমা দিন",
+    "reset": "রিসেট",
+    "yes": "হ্যাঁ",
+    "no": "না",
+    "ok": "ঠিক আছে",
+    "all": "সব",
+    "changes": "পরিবর্তন",
+    "management": "ব্যবস্থাপনা"
+  },
+  "hazards": {
+    "highWaves": "উচ্চ ঢেউ",
+    "marineDebris": "সমুদ্রের আবর্জনা",
+    "stormSurge": "ঝড়ের ঢেউ",
+    "waterPollution": "জল দূষণ",
+    "coastalFlooding": "উপকূলীয় বন্যা",
+    "cycloneWarning": "সাইক্লোন সতর্কতা",
+    "other": "অন্যান্য"
+  },
+  "status": {
+    "verified": "যাচাইকৃত",
+    "pending": "মুলতবি",
+    "discarded": "প্রত্যাখ্যাত",
+    "relevant": "প্রাসঙ্গিক",
+    "notRelevant": "অপ্রাসঙ্গিক"
+  },
+  "severity": {
+    "low": "নিম্ন",
+    "medium": "মাঝারি",
+    "high": "উচ্চ"
+  }
+}

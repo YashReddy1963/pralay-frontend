@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "signIn": "साइन इन करा",
+    "signUp": "साइन अप करा",
+    "dashboard": "डॅशबोर्ड",
+    "reports": "अहवाल",
+    "analytics": "विश्लेषण",
+    "settings": "सेटिंग्ज",
+    "history": "इतिहास",
+    "admin": "अॅडमिन",
+    "socialFeed": "सोशल फीड"
+  },
+  "common": {
+    "loading": "लोड होत आहे...",
+    "error": "त्रुटी",
+    "success": "यश",
+    "save": "जतन करा",
+    "cancel": "रद्द करा",
+    "delete": "हटवा",
+    "edit": "संपादन करा",
+    "view": "पहा",
+    "close": "बंद करा",
+    "back": "मागे",
+    "next": "पुढे",
+    "previous": "मागील",
+    "search": "शोधा",
+    "filter": "फिल्टर",
+    "export": "एक्सपोर्ट",
+    "download": "डाउनलोड",
+    "upload": "अपलोड",
+    "submit": "सबमिट करा",
+    "reset": "रीसेट",
+    "yes": "होय",
+    "no": "नाही",
+    "ok": "ठीक आहे",
+    "all": "सर्व",
+    "changes": "बदल",
+    "management": "व्यवस्थापन"
+  },
+  "hazards": {
+    "highWaves": "उच्च लाटा",
+    "marineDebris": "समुद्री कचरा",
+    "stormSurge": "तूफानी लाटा",
+    "waterPollution": "जल प्रदूषण",
+    "coastalFlooding": "किनारी बुडवण",
+    "cycloneWarning": "चक्रीवादळ चेतावणी",
+    "other": "इतर"
+  },
+  "status": {
+    "verified": "सत्यापित",
+    "pending": "प्रलंबित",
+    "discarded": "टाकून दिले",
+    "relevant": "संबंधित",
+    "notRelevant": "असंबंधित"
+  },
+  "severity": {
+    "low": "कमी",
+    "medium": "मध्यम",
+    "high": "उच्च"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "signIn": "உள்நுழைய",
+    "signUp": "பதிவு செய்ய",
+    "dashboard": "டாஷ்போர்டு",
+    "reports": "அறிக்கைகள்",
+    "analytics": "பகுப்பாய்வு",
+    "settings": "அமைப்புகள்",
+    "history": "வரலாறு",
+    "admin": "நிர்வாகம்",
+    "socialFeed": "சமூக ஊட்டம்"
+  },
+  "common": {
+    "loading": "ஏற்றுகிறது...",
+    "error": "பிழை",
+    "success": "வெற்றி",
+    "save": "சேமி",
+    "cancel": "ரத்து செய்",
+    "delete": "நீக்கு",
+    "edit": "திருத்து",
+    "view": "பார்க்க",
+    "close": "மூடு",
+    "back": "பின்",
+    "next": "அடுத்து",
+    "previous": "முந்தைய",
+    "search": "தேடு",
+    "filter": "வடிகட்டி",
+    "export": "ஏற்றுமதி",
+    "download": "பதிவிறக்கு",
+    "upload": "பதிவேற்று",
+    "submit": "சமர்ப்பி",
+    "reset": "மீட்டமை",
+    "yes": "ஆம்",
+    "no": "இல்லை",
+    "ok": "சரி",
+    "all": "அனைத்தும்",
+    "changes": "மாற்றங்கள்",
+    "management": "மேலாண்மை"
+  },
+  "hazards": {
+    "highWaves": "உயர்ந்த அலைகள்",
+    "marineDebris": "கடல் குப்பை",
+    "stormSurge": "புயல் அலை",
+    "waterPollution": "நீர் மாசுபாடு",
+    "coastalFlooding": "கடற்கரை வெள்ளம்",
+    "cycloneWarning": "சூறாவளி எச்சரிக்கை",
+    "other": "மற்றவை"
+  },
+  "status": {
+    "verified": "சரிபார்க்கப்பட்டது",
+    "pending": "நிலுவையில்",
+    "discarded": "நிராகரிக்கப்பட்டது",
+    "relevant": "தொடர்புடைய",
+    "notRelevant": "தொடர்பில்லாத"
+  },
+  "severity": {
+    "low": "குறைந்த",
+    "medium": "நடுத்தர",
+    "high": "உயர்ந்த"
+  }
+}

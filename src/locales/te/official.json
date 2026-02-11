@@ -1,0 +1,64 @@
+{
+  "title": "సముద్ర డ్యాష్‌బోర్డ్",
+  "subtitle": "అధికారిక పోర్టల్",
+  "hazardMap": {
+    "title": "అపాయ మ్యాప్",
+    "subtitle": "రిపోర్ట్ చేయబడిన అపాయాల యొక్క నేరుగా అవలోకనం",
+    "totalReports": "మొత్తం రిపోర్ట్లు",
+    "verified": "ధృవీకరించబడింది",
+    "pending": "పెండింగ్‌లో",
+    "highPriority": "ఎక్కువ ప్రాధాన్యత",
+    "filters": "ఫిల్టర్‌లు",
+    "searchLocation": "స్థానం లేదా అపాయ రకాన్ని వెతకండి...",
+    "allHazards": "అన్ని అపాయాలు",
+    "allStatus": "అన్ని స్థితులు",
+    "dateRange": "తేదీ పరిధి",
+    "last24Hours": "గత 24 గంటలు",
+    "last7Days": "గత 7 రోజులు",
+    "last30Days": "గత 30 రోజులు",
+    "last90Days": "గత 90 రోజులు",
+    "legend": "లెజెండ్",
+    "relatedPosts": "సంబంధిత పోస్ట్‌లు",
+    "images": "చిత్రాలు"
+  },
+  "settings": {
+    "title": "డ్యాష్‌బోర్డ్ సెట్టింగ్‌లు",
+    "subtitle": "అధికారుల కోసం భాష మరియు ప్రాధాన్యతలను కాన్ఫిగర్ చేయండి",
+    "appearance": "దృశ్యం",
+    "darkMode": "డార్క్ మోడ్",
+    "darkModeDesc": "అధికారిక డ్యాష్‌బోర్డ్‌లో డార్క్ థీమ్ ఉపయోగించండి",
+    "language": "భాష",
+    "displayLanguage": "ప్రదర్శన భాష",
+    "notifications": "నోటిఫికేషన్‌లు",
+    "emailPushNotifications": "ఇమెయిల్ మరియు పుష్ నోటిఫికేషన్‌లు",
+    "emailPushNotificationsDesc": "కొత్త రిపోర్ట్లు మరియు పనుల గురించి నవీకరణలను పొందండి",
+    "dataSync": "డేటా మరియు సమకాలీకరణ",
+    "autoSync": "ఆటో సమకాలీకరణ",
+    "autoSyncDesc": "డ్యాష్‌బోర్డ్ డేటాను స్వయంచాలకంగా నవీకరించండి",
+    "exportData": "డేటాను ఎగుమతి చేయండి",
+    "clearLocalCache": "లోకల్ కాష్ క్లియర్ చేయండి",
+    "about": "గురించి",
+    "version": "వెర్‌షన్",
+    "role": "పాత్ర"
+  },
+  "analytics": {
+    "weeklyTrends": "వారపు రిపోర్ట్ ట్రెండ్‌లు",
+    "hazardDistribution": "అపాయ రకాల పంపిణీ",
+    "citizenParticipation": "పౌర పాల్గొనే విధానం (రిపోర్ట్లు వర్సెస్ ధృవీకరించబడింది)",
+    "highActivityLocations": "ఎక్కువ కార్యకలాపాల స్థానాలు",
+    "performanceInsights": "పనితీరు అంతర్దృష్టులు",
+    "recommendations": "సిఫార్సులు",
+    "avgResponseTime": "సగటు ప్రతిస్పందన సమయం",
+    "criticalIncidents": "క్లిష్టమైన సంఘటనలు"
+  },
+  "reports": {
+    "advancedFilters": "అధునాతన ఫిల్టర్‌లు",
+    "pendingReview": "సమీక్ష పెండింగ్‌లో"
+  },
+  "social": {
+    "trendingAnalysis": "ట్రెండ్ విశ్లేషణ",
+    "totalPosts": "మొత్తం పోస్ట్‌లు",
+    "relevant": "సంబంధిత",
+    "underReview": "సమీక్ష క్రింద"
+  }
+}

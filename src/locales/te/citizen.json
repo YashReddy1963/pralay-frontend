@@ -1,0 +1,52 @@
+{
+  "title": "సముద్ర రిపోర్టర్",
+  "reportHazard": {
+    "title": "అపాయాన్ని రిపోర్ట్ చేయండి",
+    "location": "స్థానం",
+    "description": "వివరణ",
+    "imageUpload": "చిత్రం అప్‌లోడ్",
+    "submitReport": "రిపోర్ట్ సమర్పించు"
+  },
+  "history": {
+    "title": "రిపోర్ట్ చరిత్ర",
+    "noReports": "రిపోర్ట్లు ఏవీ లేవు.",
+    "searchPlaceholder": "మీ రిపోర్ట్లను వెతకండి...",
+    "totalReports": "మొత్తం రిపోర్ట్లు",
+    "verified": "ధృవీకరించబడింది",
+    "pendingSync": "సమకాలీకరణ పెండింగ్‌లో",
+    "viewDetails": "వివరాలను చూడండి"
+  },
+  "settings": {
+    "title": "పౌర సెట్టింగ్‌లు",
+    "subtitle": "మీ ప్రాధాన్యతలు మరియు ఖాతా సెట్టింగ్‌లను నిర్వహించండి",
+    "appearance": "దృశ్యం",
+    "darkMode": "డార్క్ మోడ్",
+    "darkModeDesc": "పౌర పోర్టల్‌లో డార్క్ థీమ్ ఉపయోగించండి",
+    "language": "భాష",
+    "displayLanguage": "ప్రదర్శన భాష",
+    "notifications": "నోటిఫికేషన్‌లు",
+    "emailPushNotifications": "ఇమెయిల్ మరియు పుష్ నోటిఫికేషన్‌లు",
+    "emailPushNotificationsDesc": "మీ రిపోర్ట్ స్థితి గురించి నవీకరణలను పొందండి",
+    "dataSync": "డేటా మరియు సమకాలీకరణ",
+    "autoSync": "ఆటో సమకాలీకరణ",
+    "autoSyncDesc": "మీ రిపోర్ట్ డేటాను స్వయంచాలకంగా సమకాలీకరించండి",
+    "exportData": "డేటాను ఎగుమతి చేయండి",
+    "clearLocalCache": "లోకల్ కాష్ క్లియర్ చేయండి",
+    "about": "గురించి",
+    "version": "వెర్‌షన్",
+    "role": "పాత్ర",
+    "location": "స్థానం",
+    "autoLocation": "ఆటో లొకేషన్",
+    "autoLocationDesc": "అపాయాలను రిపోర్ట్ చేసేటప్పుడు మీ స్థానాన్ని స్వయంచాలకంగా గుర్తించండి",
+    "media": "మీడియా",
+    "highQualityImages": "ఉన్నత నాణ్యత చిత్రాలు",
+    "highQualityImagesDesc": "ఉన్నత స్పష్టతతో చిత్రాలను అప్‌లోడ్ చేయండి (మరిన్ని డేటా ఉపయోగిస్తుంది)",
+    "dataManagement": "డేటా నిర్వహణ",
+    "clearOfflineData": "ఆఫ్‌లైన్ డేటాను క్లియర్ చేయండి",
+    "dataExported": "డేటా ఎగుమతి చేయబడింది",
+    "dataExportedDesc": "మీ రిపోర్ట్ డేటా డౌన్‌లోడ్ చేయబడింది.",
+    "offlineDataCleared": "ఆఫ్‌లైన్ డేటా క్లియర్ చేయబడింది",
+    "offlineDataClearedDesc": "స్థానికంగా నిల్వ చేయబడిన అన్ని రిపోర్ట్లు తొలగించబడ్డాయి.",
+    "preferencesSaved": "మీ ప్రాధాన్యతలు సేవ్ చేయబడ్డాయి."
+  }
+}

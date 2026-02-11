@@ -1,0 +1,39 @@
+{
+  "title": "महासागर अहवालदार",
+  "reportHazard": {
+    "title": "धोका अहवाल द्या",
+    "location": "स्थान",
+    "description": "वर्णन",
+    "imageUpload": "प्रतिमा अपलोड करा",
+    "submitReport": "अहवाल सबमिट करा"
+  },
+  "history": {
+    "title": "अहवाल इतिहास",
+    "noReports": "कोणतेही अहवाल सापडले नाहीत.",
+    "searchPlaceholder": "तुमचे अहवाल शोधा...",
+    "totalReports": "एकूण अहवाल",
+    "verified": "सत्यापित",
+    "pendingSync": "प्रलंबित सिंक",
+    "viewDetails": "तपशील पहा"
+  },
+  "settings": {
+    "title": "नागरिक सेटिंग्ज",
+    "subtitle": "तुमच्या प्राधान्ये आणि खाता सेटिंग्ज व्यवस्थापित करा",
+    "appearance": "देखावा",
+    "darkMode": "डार्क मोड",
+    "darkModeDesc": "नागरिक पोर्टलवर डार्क थीम लागू करा",
+    "language": "भाषा",
+    "displayLanguage": "प्रदर्शन भाषा",
+    "notifications": "सूचना",
+    "emailPushNotifications": "ईमेल आणि पुश सूचना",
+    "emailPushNotificationsDesc": "तुमच्या अहवाल स्थितीबद्दल अपडेट मिळवा",
+    "dataSync": "डेटा आणि सिंक",
+    "autoSync": "स्वयंचलित सिंक",
+    "autoSyncDesc": "तुमचा अहवाल डेटा स्वयंचलित सिंक करा",
+    "exportData": "डेटा एक्सपोर्ट करा",
+    "clearLocalCache": "स्थानिक कॅश साफ करा",
+    "about": "बद्दल",
+    "version": "आवृत्ती",
+    "role": "भूमिका"
+  }
+}

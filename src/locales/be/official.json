@@ -1,0 +1,64 @@
+{
+  "title": "সমুদ্র ড্যাশবোর্ড",
+  "subtitle": "সরকারি পোর্টাল",
+  "hazardMap": {
+    "title": "বিপদ মানচিত্র",
+    "subtitle": "রিপোর্ট করা বিপদের সরাসরি ওভারভিউ",
+    "totalReports": "মোট রিপোর্ট",
+    "verified": "যাচাইকৃত",
+    "pending": "মুলতবি",
+    "highPriority": "উচ্চ অগ্রাধিকার",
+    "filters": "ফিল্টার",
+    "searchLocation": "অবস্থান বা বিপদের ধরন অনুসন্ধান করুন...",
+    "allHazards": "সব বিপদ",
+    "allStatus": "সব অবস্থা",
+    "dateRange": "তারিখের পরিসর",
+    "last24Hours": "গত ২৪ ঘন্টা",
+    "last7Days": "গত ৭ দিন",
+    "last30Days": "গত ৩০ দিন",
+    "last90Days": "গত ৯০ দিন",
+    "legend": "লেজেন্ড",
+    "relatedPosts": "সম্পর্কিত পোস্ট",
+    "images": "ছবি"
+  },
+  "settings": {
+    "title": "ড্যাশবোর্ড সেটিংস",
+    "subtitle": "কর্মকর্তাদের জন্য ভাষা এবং পছন্দ কনফিগার করুন",
+    "appearance": "চেহারা",
+    "darkMode": "ডার্ক মোড",
+    "darkModeDesc": "সরকারি ড্যাশবোর্ডে ডার্ক থিম ব্যবহার করুন",
+    "language": "ভাষা",
+    "displayLanguage": "প্রদর্শন ভাষা",
+    "notifications": "বিজ্ঞপ্তি",
+    "emailPushNotifications": "ইমেইল এবং পুশ বিজ্ঞপ্তি",
+    "emailPushNotificationsDesc": "নতুন রিপোর্ট এবং কাজ সম্পর্কে আপডেট পান",
+    "dataSync": "ডেটা এবং সিঙ্ক",
+    "autoSync": "অটো সিঙ্ক",
+    "autoSyncDesc": "ড্যাশবোর্ড ডেটা স্বয়ংক্রিয়ভাবে আপডেট করুন",
+    "exportData": "ডেটা রপ্তানি করুন",
+    "clearLocalCache": "লোকাল ক্যাশ সাফ করুন",
+    "about": "সম্পর্কে",
+    "version": "সংস্করণ",
+    "role": "ভূমিকা"
+  },
+  "analytics": {
+    "weeklyTrends": "সাপ্তাহিক রিপোর্ট ট্রেন্ড",
+    "hazardDistribution": "বিপদের ধরনের বিতরণ",
+    "citizenParticipation": "নাগরিক অংশগ্রহণ (রিপোর্ট বনাম যাচাইকৃত)",
+    "highActivityLocations": "উচ্চ কার্যকলাপের অবস্থান",
+    "performanceInsights": "কর্মক্ষমতার অন্তর্দৃষ্টি",
+    "recommendations": "সুপারিশ",
+    "avgResponseTime": "গড় প্রতিক্রিয়া সময়",
+    "criticalIncidents": "সমালোচনামূলক ঘটনা"
+  },
+  "reports": {
+    "advancedFilters": "উন্নত ফিল্টার",
+    "pendingReview": "পর্যালোচনা মুলতবি"
+  },
+  "social": {
+    "trendingAnalysis": "ট্রেন্ড বিশ্লেষণ",
+    "totalPosts": "মোট পোস্ট",
+    "relevant": "প্রাসঙ্গিক",
+    "underReview": "পর্যালোচনার অধীনে"
+  }
+}

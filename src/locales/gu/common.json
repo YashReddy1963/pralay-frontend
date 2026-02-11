@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "signIn": "સાઇન ઇન કરો",
+    "signUp": "સાઇન અપ કરો",
+    "dashboard": "ડેશબોર્ડ",
+    "reports": "રિપોર્ટ્સ",
+    "analytics": "વિશ્લેષણ",
+    "settings": "સેટિંગ્સ",
+    "history": "ઇતિહાસ",
+    "admin": "એડમિન",
+    "socialFeed": "સોશિયલ ફીડ"
+  },
+  "common": {
+    "loading": "લોડ થઈ રહ્યું છે...",
+    "error": "ભૂલ",
+    "success": "સફળતા",
+    "save": "સાચવો",
+    "cancel": "રદ કરો",
+    "delete": "ડિલીટ કરો",
+    "edit": "સંપાદન કરો",
+    "view": "જુઓ",
+    "close": "બંધ કરો",
+    "back": "પાછળ",
+    "next": "આગળ",
+    "previous": "પહેલાનું",
+    "search": "શોધો",
+    "filter": "ફિલ્ટર",
+    "export": "એક્સપોર્ટ",
+    "download": "ડાઉનલોડ",
+    "upload": "અપલોડ",
+    "submit": "સબમિટ કરો",
+    "reset": "રીસેટ",
+    "yes": "હા",
+    "no": "ના",
+    "ok": "ઠીક છે",
+    "all": "બધા",
+    "changes": "ફેરફારો",
+    "management": "વ્યવસ્થાપન"
+  },
+  "hazards": {
+    "highWaves": "ઉચ્ચ લહરો",
+    "marineDebris": "સમુદ્રી કચરો",
+    "stormSurge": "તોફાની લહરો",
+    "waterPollution": "પાણીનું પ્રદૂષણ",
+    "coastalFlooding": "કિનારા પર પૂર",
+    "cycloneWarning": "ચક્રવાત ચેતવણી",
+    "other": "અન્ય"
+  },
+  "status": {
+    "verified": "ચકાસાયેલ",
+    "pending": "પેન્ડિંગ",
+    "discarded": "ફેંકી દેવાયેલ",
+    "relevant": "સંબંધિત",
+    "notRelevant": "અસંબંધિત"
+  },
+  "severity": {
+    "low": "નીચું",
+    "medium": "મધ્યમ",
+    "high": "ઉચ્ચ"
+  }
+}

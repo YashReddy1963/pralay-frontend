@@ -1,0 +1,64 @@
+{
+  "title": "સમુદ્ર ડેશબોર્ડ",
+  "subtitle": "અધિકૃત પોર્ટલ",
+  "hazardMap": {
+    "title": "ખતરો નકશો",
+    "subtitle": "રિપોર્ટ કરેલા ખતરાઓનો રિયલ-ટાઇમ ઓવરવ્યુ",
+    "totalReports": "કુલ રિપોર્ટ્સ",
+    "verified": "ચકાસાયેલ",
+    "pending": "પેન્ડિંગ",
+    "highPriority": "હાઈ પ્રાયોરિટી",
+    "filters": "ફિલ્ટર્સ",
+    "searchLocation": "સ્થાન અથવા ખતરો પ્રકાર શોધો...",
+    "allHazards": "બધા ખતરા",
+    "allStatus": "બધા સ્ટેટસ",
+    "dateRange": "તારીખ રેન્જ",
+    "last24Hours": "છેલ્લા 24 કલાક",
+    "last7Days": "છેલ્લા 7 દિવસ",
+    "last30Days": "છેલ્લા 30 દિવસ",
+    "last90Days": "છેલ્લા 90 દિવસ",
+    "legend": "લેજન્ડ",
+    "relatedPosts": "સંબંધિત પોસ્ટ્સ",
+    "images": "ઇમેજ્સ"
+  },
+  "settings": {
+    "title": "ડેશબોર્ડ સેટિંગ્સ",
+    "subtitle": "અધિકારીઓ માટે ભાષા અને પસંદગીઓ કન્ફિગર કરો",
+    "appearance": "દેખાવ",
+    "darkMode": "ડાર્ક મોડ",
+    "darkModeDesc": "અધિકૃત ડેશબોર્ડ પર ડાર્ક થીમ લાગુ કરો",
+    "language": "ભાષા",
+    "displayLanguage": "ડિસ્પ્લે ભાષા",
+    "notifications": "સૂચનાઓ",
+    "emailPushNotifications": "ઇમેઇલ અને પુશ સૂચનાઓ",
+    "emailPushNotificationsDesc": "નવા રિપોર્ટ્સ અને એસાઇનમેન્ટ્સ વિશે અપડેટ્સ મેળવો",
+    "dataSync": "ડેટા અને સિંક",
+    "autoSync": "ઓટો સિંક",
+    "autoSyncDesc": "ડેશબોર્ડ ડેટાને ઓટો રિફ્રેશ કરો",
+    "exportData": "ડેટા એક્સપોર્ટ કરો",
+    "clearLocalCache": "લોકલ કેશ ક્લિયર કરો",
+    "about": "વિશે",
+    "version": "વર્ઝન",
+    "role": "ભૂમિકા"
+  },
+  "analytics": {
+    "weeklyTrends": "સાપ્તાહિક રિપોર્ટ ટ્રેન્ડ્સ",
+    "hazardDistribution": "ખતરો પ્રકારોનું વિતરણ",
+    "citizenParticipation": "નાગરિક ભાગીદારી (રિપોર્ટ્સ વિરુદ્ધ ચકાસાયેલ)",
+    "highActivityLocations": "હાઈ એક્ટિવિટી લોકેશન્સ",
+    "performanceInsights": "પરફોર્મન્સ ઇનસાઇટ્સ",
+    "recommendations": "ભલામણો",
+    "avgResponseTime": "સરેરાશ પ્રતિભાવ સમય",
+    "criticalIncidents": "ક્રિટિકલ ઇન્સિડન્ટ્સ"
+  },
+  "reports": {
+    "advancedFilters": "એડવાન્સ ફિલ્ટર્સ",
+    "pendingReview": "પેન્ડિંગ રિવ્યુ"
+  },
+  "social": {
+    "trendingAnalysis": "ટ્રેન્ડિંગ એનાલિસિસ",
+    "totalPosts": "કુલ પોસ્ટ્સ",
+    "relevant": "સંબંધિત",
+    "underReview": "રિવ્યુ હેઠળ"
+  }
+}

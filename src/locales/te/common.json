@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "signIn": "సైన్ ఇన్",
+    "signUp": "సైన్ అప్",
+    "dashboard": "డ్యాష్‌బోర్డ్",
+    "reports": "రిపోర్ట్లు",
+    "analytics": "విశ్లేషణ",
+    "settings": "సెట్టింగ్‌లు",
+    "history": "చరిత్ర",
+    "admin": "అడ్మిన్",
+    "socialFeed": "సోషల్ ఫీడ్"
+  },
+  "common": {
+    "loading": "లోడ్ అవుతోంది...",
+    "error": "లోపం",
+    "success": "విజయం",
+    "save": "సేవ్ చేయి",
+    "cancel": "రద్దు చేయి",
+    "delete": "తొలగించు",
+    "edit": "సవరించు",
+    "view": "చూడండి",
+    "close": "మూసివేయి",
+    "back": "వెనుకకు",
+    "next": "తదుపరి",
+    "previous": "మునుపటి",
+    "search": "వెతకండి",
+    "filter": "ఫిల్టర్",
+    "export": "ఎగుమతి",
+    "download": "డౌన్‌లోడ్",
+    "upload": "అప్‌లోడ్",
+    "submit": "సమర్పించు",
+    "reset": "రీసెట్",
+    "yes": "అవును",
+    "no": "కాదు",
+    "ok": "సరే",
+    "all": "అన్నీ",
+    "changes": "మార్పులు",
+    "management": "నిర్వహణ"
+  },
+  "hazards": {
+    "highWaves": "ఎత్తైన అలలు",
+    "marineDebris": "సముద్ర చెత్త",
+    "stormSurge": "గాలివాన అల",
+    "waterPollution": "నీటి కాలుష్యం",
+    "coastalFlooding": "తీర ప్రాంత వరదలు",
+    "cycloneWarning": "సైక్లోన్ హెచ్చరిక",
+    "other": "ఇతర"
+  },
+  "status": {
+    "verified": "ధృవీకరించబడింది",
+    "pending": "పెండింగ్‌లో",
+    "discarded": "తిరస్కరించబడింది",
+    "relevant": "సంబంధిత",
+    "notRelevant": "సంబంధం లేని"
+  },
+  "severity": {
+    "low": "తక్కువ",
+    "medium": "మధ్యస్థ",
+    "high": "ఎక్కువ"
+  }
+}

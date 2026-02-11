@@ -1,0 +1,52 @@
+{
+  "title": "সমুদ্র রিপোর্টার",
+  "reportHazard": {
+    "title": "বিপদ রিপোর্ট করুন",
+    "location": "অবস্থান",
+    "description": "বিবরণ",
+    "imageUpload": "ছবি আপলোড",
+    "submitReport": "রিপোর্ট জমা দিন"
+  },
+  "history": {
+    "title": "রিপোর্ট ইতিহাস",
+    "noReports": "কোনো রিপোর্ট নেই।",
+    "searchPlaceholder": "আপনার রিপোর্ট অনুসন্ধান করুন...",
+    "totalReports": "মোট রিপোর্ট",
+    "verified": "যাচাইকৃত",
+    "pendingSync": "সিঙ্ক মুলতবি",
+    "viewDetails": "বিস্তারিত দেখুন"
+  },
+  "settings": {
+    "title": "নাগরিক সেটিংস",
+    "subtitle": "আপনার পছন্দ এবং অ্যাকাউন্ট সেটিংস পরিচালনা করুন",
+    "appearance": "চেহারা",
+    "darkMode": "ডার্ক মোড",
+    "darkModeDesc": "নাগরিক পোর্টালে ডার্ক থিম ব্যবহার করুন",
+    "language": "ভাষা",
+    "displayLanguage": "প্রদর্শন ভাষা",
+    "notifications": "বিজ্ঞপ্তি",
+    "emailPushNotifications": "ইমেইল এবং পুশ বিজ্ঞপ্তি",
+    "emailPushNotificationsDesc": "আপনার রিপোর্টের অবস্থা সম্পর্কে আপডেট পান",
+    "dataSync": "ডেটা এবং সিঙ্ক",
+    "autoSync": "অটো সিঙ্ক",
+    "autoSyncDesc": "আপনার রিপোর্ট ডেটা স্বয়ংক্রিয়ভাবে সিঙ্ক করুন",
+    "exportData": "ডেটা রপ্তানি করুন",
+    "clearLocalCache": "লোকাল ক্যাশ সাফ করুন",
+    "about": "সম্পর্কে",
+    "version": "সংস্করণ",
+    "role": "ভূমিকা",
+    "location": "অবস্থান",
+    "autoLocation": "অটো লোকেশন",
+    "autoLocationDesc": "বিপদ রিপোর্ট করার সময় আপনার অবস্থান স্বয়ংক্রিয়ভাবে সনাক্ত করুন",
+    "media": "মিডিয়া",
+    "highQualityImages": "উচ্চ মানের ছবি",
+    "highQualityImagesDesc": "উচ্চ রেজোলিউশনে ছবি আপলোড করুন (আরও ডেটা ব্যবহার করে)",
+    "dataManagement": "ডেটা ব্যবস্থাপনা",
+    "clearOfflineData": "অফলাইন ডেটা সাফ করুন",
+    "dataExported": "ডেটা রপ্তানি হয়েছে",
+    "dataExportedDesc": "আপনার রিপোর্ট ডেটা ডাউনলোড হয়েছে।",
+    "offlineDataCleared": "অফলাইন ডেটা সাফ হয়েছে",
+    "offlineDataClearedDesc": "স্থানীয়ভাবে সংরক্ষিত সমস্ত রিপোর্ট মুছে ফেলা হয়েছে।",
+    "preferencesSaved": "আপনার পছন্দ সংরক্ষিত হয়েছে।"
+  }
+}

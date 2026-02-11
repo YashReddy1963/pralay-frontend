@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "dashboard": "Dashboard",
+    "reports": "Reports",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "history": "History",
+    "admin": "Admin"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "download": "Download",
+    "upload": "Upload",
+    "submit": "Submit",
+    "reset": "Reset",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK"
+  },
+  "hazards": {
+    "highWaves": "High Waves",
+    "marineDebris": "Marine Debris",
+    "stormSurge": "Storm Surge",
+    "waterPollution": "Water Pollution",
+    "coastalFlooding": "Coastal Flooding",
+    "cycloneWarning": "Cyclone Warning",
+    "tsunamiAlert": "Tsunami Alert",
+    "oilSpill": "Oil Spill",
+    "coastalErosion": "Coastal Erosion"
+  },
+  "status": {
+    "verified": "Verified",
+    "pending": "Pending",
+    "discarded": "Discarded",
+    "underReview": "Under Review",
+    "escalated": "Escalated",
+    "suspicious": "Suspicious"
+  },
+  "severity": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "lastWeek": "Last Week",
+    "lastMonth": "Last Month",
+    "lastYear": "Last Year",
+    "hoursAgo": "{{count}} hours ago",
+    "daysAgo": "{{count}} days ago",
+    "minutesAgo": "{{count}} minutes ago"
+  }
+}

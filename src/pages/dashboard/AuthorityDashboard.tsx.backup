@@ -1,0 +1,732 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { 
+  AlertTriangle,
+  TrendingUp,
+  Users,
+  BarChart3,
+  Shield,
+  UserPlus,
+  Settings,
+  Eye,
+  Edit,
+  Trash2,
+  Plus,
+  Search,
+  Filter,
+  MapPin,
+  Upload,
+  EyeOff
+} from "lucide-react";
+import { useOfficialLanguage } from "@/contexts/LanguageContext";
+import { toast } from "sonner";
+import { apiService } from "@/services/api";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+
+const AuthorityDashboard = () => {
+  const { t } = useOfficialLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("overview");
+
+  // Redirect district chairmen and other sub-authorities away from this page
+  useEffect(() => {
+    if (user && user.role !== 'state_chairman') {
+      // Redirect to main dashboard for district chairmen and other roles
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
+  // Don't render anything if user is not state chairman
+  if (!user || user.role !== 'state_chairman') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Access Restricted</h2>
+          <p className="text-muted-foreground">This page is only available for State Chairman.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Mock data for team members
+  const teamMembers = [
+    {
+      id: 1,
+      name: "Sarah Johnson",
+      role: "Assistant Coordinator",
+      email: "sarah.johnson@gov.in",
+      status: "Active",
+      lastActive: "2 hours ago",
+      avatar: null
+    },
+    {
+      id: 2,
+      name: "Michael Chen",
+      role: "Field Officer",
+      email: "michael.chen@gov.in",
+      status: "Active",
+      lastActive: "1 day ago",
+      avatar: null
+    },
+    {
+      id: 3,
+      name: "Priya Sharma",
+      role: "Data Analyst",
+      email: "priya.sharma@gov.in",
+      status: "Away",
+      lastActive: "3 days ago",
+      avatar: null
+    }
+  ];
+
+  // Mock data for subordinate authorities
+  const subordinateAuthorities = [
+    {
+      id: 1,
+      name: "District Emergency Manager",
+      level: "District",
+      location: "Chennai District",
+      reportsCount: 45,
+      status: "Active",
+      createdDate: "2024-01-15"
+    },
+    {
+      id: 2,
+      name: "Local Area Coordinator",
+      level: "Local",
+      location: "Marina Beach Zone",
+      reportsCount: 23,
+      status: "Active",
+      createdDate: "2024-02-01"
+    }
+  ];
+
+  const [teamMemberForm, setTeamMemberForm] = useState({
+    first_name: "",
+    middle_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    designation: "",
+    state: "",
+    district: "",
+    nagar_panchayat: "",
+    village: "",
+    address: "",
+    government_service_id: "",
+    can_view_reports: false,
+    can_approve_reports: false,
+    can_manage_teams: false,
+    password1: "",
+    password2: ""
+  });
+
+  const [authorityForm, setAuthorityForm] = useState({
+    first_name: "",
+    middle_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    designation: "",
+    role: "",
+    state: "",
+    district: "",
+    nagar_panchayat: "",
+    village: "",
+    address: "",
+    government_service_id: "",
+    can_view_reports: false,
+    can_approve_reports: false,
+    can_manage_teams: false,
+    password1: "",
+    password2: ""
+  });
+
+  // State for API data
+  const [teamMembersData, setTeamMembersData] = useState<any[]>([]);
+  const [isLoadingTeamMembers, setIsLoadingTeamMembers] = useState(false);
+  const [isSubmittingTeam, setIsSubmittingTeam] = useState(false);
+  const [isSubmittingAuthority, setIsSubmittingAuthority] = useState(false);
+
+  // Modal states
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const [isAuthorityModalOpen, setIsAuthorityModalOpen] = useState(false);
+
+  // Dynamic metrics based on user role and actual data
+  const metrics = {
+    activeReports: 24,
+    resolved: 156,
+    teamMembers: teamMembersData.length, // Only state chairman can access this page
+    responseTime: "2.3h"
+  };
+
+  // Fetch team members data
+  const fetchTeamMembers = async () => {
+    if (user?.role !== 'state_chairman') return;
+    
+    try {
+      setIsLoadingTeamMembers(true);
+      const response = await apiService.getAuthorityTeamMembers();
+      if (response.success) {
+        setTeamMembersData(response.team_members);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to fetch team members");
+      console.error("Fetch team members error:", error);
+    } finally {
+      setIsLoadingTeamMembers(false);
+    }
+  };
+
+  // Handle team member creation (placeholder - API method not implemented)
+  const handleTeamSubmit = async () => {
+    toast.error("Team member creation feature is not yet implemented in the API");
+    setIsTeamModalOpen(false);
+  };
+
+  // Handle authority creation (placeholder - API method not implemented)
+  const handleAuthoritySubmit = async () => {
+    toast.error("Authority creation feature is not yet implemented in the API");
+    setIsAuthorityModalOpen(false);
+  };
+
+  // Load data on component mount
+  useEffect(() => {
+    fetchTeamMembers();
+  }, [user?.role]);
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Authority Dashboard</h1>
+          <p className="text-muted-foreground">Manage your team and subordinate authorities</p>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Badge variant="outline" className="text-green-600 border-green-600">
+            State Chairman
+          </Badge>
+        </div>
+      </div>
+
+      {/* Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-red-100 rounded-lg">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Active Reports</p>
+                <p className="text-2xl font-bold">{metrics.activeReports}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <TrendingUp className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Resolved</p>
+                <p className="text-2xl font-bold">{metrics.resolved}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Team Members</p>
+                <p className="text-2xl font-bold">{metrics.teamMembers}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <BarChart3 className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Avg Response Time</p>
+                <p className="text-2xl font-bold">{metrics.responseTime}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="team">Team Management</TabsTrigger>
+          <TabsTrigger value="authorities">Subordinate Authorities</TabsTrigger>
+        </TabsList>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Users className="h-5 w-5" />
+                  <span>Recent Team Activity</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {teamMembers.slice(0, 3).map((member) => (
+                    <div key={member.id} className="flex items-center space-x-4">
+                      <Avatar>
+                        <AvatarFallback>
+                          {member.name.split(' ').map((n: string) => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium">{member.name}</p>
+                        <p className="text-sm text-muted-foreground">{member.role}</p>
+                      </div>
+                      <Badge variant={member.status === 'Active' ? 'default' : 'secondary'}>
+                        {member.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Shield className="h-5 w-5" />
+                  <span>Authority Status</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {subordinateAuthorities.map((authority) => (
+                    <div key={authority.id} className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{authority.name}</p>
+                        <p className="text-sm text-muted-foreground">{authority.location}</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="default">{authority.status}</Badge>
+                        <p className="text-sm text-muted-foreground mt-1">{authority.reportsCount} reports</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Team Management Tab */}
+        <TabsContent value="team" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center space-x-2">
+                <Users className="h-5 w-5" />
+                <span>Team Members</span>
+              </CardTitle>
+              <Dialog open={isTeamModalOpen} onOpenChange={setIsTeamModalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Add Team Member
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Create Team Member</DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="space-y-6">
+                    {/* Personal Information */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Personal Information</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="first_name">First Name *</Label>
+                          <Input
+                            id="first_name"
+                            value={teamMemberForm.first_name}
+                            onChange={(e) => setTeamMemberForm(prev => ({...prev, first_name: e.target.value}))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="last_name">Last Name *</Label>
+                          <Input
+                            id="last_name"
+                            value={teamMemberForm.last_name}
+                            onChange={(e) => setTeamMemberForm(prev => ({...prev, last_name: e.target.value}))}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="email">Email *</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={teamMemberForm.email}
+                            onChange={(e) => setTeamMemberForm(prev => ({...prev, email: e.target.value}))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="phone_number">Phone Number *</Label>
+                          <Input
+                            id="phone_number"
+                            value={teamMemberForm.phone_number}
+                            onChange={(e) => setTeamMemberForm(prev => ({...prev, phone_number: e.target.value}))}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="designation">Designation *</Label>
+                        <Input
+                          id="designation"
+                          value={teamMemberForm.designation}
+                          onChange={(e) => setTeamMemberForm(prev => ({...prev, designation: e.target.value}))}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Location Information */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Location Information</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="state">State *</Label>
+                          <Input
+                            id="state"
+                            value={teamMemberForm.state}
+                            onChange={(e) => setTeamMemberForm(prev => ({...prev, state: e.target.value}))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="district">District *</Label>
+                          <Input
+                            id="district"
+                            value={teamMemberForm.district}
+                            onChange={(e) => setTeamMemberForm(prev => ({...prev, district: e.target.value}))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Password */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Login Credentials</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="password1">Password *</Label>
+                          <Input
+                            id="password1"
+                            type="password"
+                            value={teamMemberForm.password1}
+                            onChange={(e) => setTeamMemberForm(prev => ({...prev, password1: e.target.value}))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="password2">Confirm Password *</Label>
+                          <Input
+                            id="password2"
+                            type="password"
+                            value={teamMemberForm.password2}
+                            onChange={(e) => setTeamMemberForm(prev => ({...prev, password2: e.target.value}))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end space-x-4 pt-4 border-t">
+                    <Button type="button" variant="outline" onClick={() => setIsTeamModalOpen(false)} disabled={isSubmittingTeam}>Cancel</Button>
+                    <Button className="bg-purple-600 hover:bg-purple-700" onClick={handleTeamSubmit} disabled={isSubmittingTeam}>
+                      {isSubmittingTeam ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Creating...
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          Create Team Member
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {isLoadingTeamMembers ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <span className="ml-2">Loading team members...</span>
+                  </div>
+                ) : teamMembersData.length > 0 ? (
+                  teamMembersData.map((member) => (
+                    <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarFallback>
+                            {member.first_name?.[0]}{member.last_name?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{member.first_name} {member.last_name}</p>
+                          <p className="text-sm text-muted-foreground">{member.email}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {member.designation} • Assigned: {new Date(member.assigned_date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant={member.is_active ? "default" : "secondary"}>
+                          {member.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                        <Button variant="ghost" size="icon" title="View Details">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" title="Remove Member" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No team members found</p>
+                    <p className="text-sm">Add team members to get started</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Subordinate Authorities Tab */}
+        <TabsContent value="authorities" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center space-x-2">
+                <Shield className="h-5 w-5" />
+                <span>Subordinate Authorities</span>
+              </CardTitle>
+              <Dialog open={isAuthorityModalOpen} onOpenChange={setIsAuthorityModalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Create Authority
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Create Subordinate Authority</DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="space-y-6">
+                    {/* Personal Information */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Personal Information</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="auth_first_name">First Name *</Label>
+                          <Input
+                            id="auth_first_name"
+                            value={authorityForm.first_name}
+                            onChange={(e) => setAuthorityForm(prev => ({...prev, first_name: e.target.value}))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="auth_last_name">Last Name *</Label>
+                          <Input
+                            id="auth_last_name"
+                            value={authorityForm.last_name}
+                            onChange={(e) => setAuthorityForm(prev => ({...prev, last_name: e.target.value}))}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="auth_email">Email *</Label>
+                          <Input
+                            id="auth_email"
+                            type="email"
+                            value={authorityForm.email}
+                            onChange={(e) => setAuthorityForm(prev => ({...prev, email: e.target.value}))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="auth_phone_number">Phone Number *</Label>
+                          <Input
+                            id="auth_phone_number"
+                            value={authorityForm.phone_number}
+                            onChange={(e) => setAuthorityForm(prev => ({...prev, phone_number: e.target.value}))}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="auth_designation">Designation *</Label>
+                          <Input
+                            id="auth_designation"
+                            value={authorityForm.designation}
+                            onChange={(e) => setAuthorityForm(prev => ({...prev, designation: e.target.value}))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="auth_role">Role *</Label>
+                          <Select value={authorityForm.role} onValueChange={(value) => setAuthorityForm(prev => ({...prev, role: value}))}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="district_chairman">District Chairman</SelectItem>
+                              <SelectItem value="nagar_panchayat_chairman">Nagar Panchayat Chairman</SelectItem>
+                              <SelectItem value="village_sarpanch">Village Sarpanch</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Location Information */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Location Information</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="auth_state">State *</Label>
+                          <Input
+                            id="auth_state"
+                            value={authorityForm.state}
+                            onChange={(e) => setAuthorityForm(prev => ({...prev, state: e.target.value}))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="auth_district">District *</Label>
+                          <Input
+                            id="auth_district"
+                            value={authorityForm.district}
+                            onChange={(e) => setAuthorityForm(prev => ({...prev, district: e.target.value}))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Password */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Login Credentials</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="auth_password1">Password *</Label>
+                          <Input
+                            id="auth_password1"
+                            type="password"
+                            value={authorityForm.password1}
+                            onChange={(e) => setAuthorityForm(prev => ({...prev, password1: e.target.value}))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="auth_password2">Confirm Password *</Label>
+                          <Input
+                            id="auth_password2"
+                            type="password"
+                            value={authorityForm.password2}
+                            onChange={(e) => setAuthorityForm(prev => ({...prev, password2: e.target.value}))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end space-x-4 pt-4 border-t">
+                    <Button type="button" variant="outline" onClick={() => setIsAuthorityModalOpen(false)} disabled={isSubmittingAuthority}>Cancel</Button>
+                    <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAuthoritySubmit} disabled={isSubmittingAuthority}>
+                      {isSubmittingAuthority ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Creating...
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          Create Authority
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {subordinateAuthorities.map((authority) => (
+                  <div key={authority.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Avatar>
+                        <AvatarFallback>
+                          {authority.name.split(' ').map((n: string) => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{authority.name}</p>
+                        <p className="text-sm text-muted-foreground">{authority.location}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {authority.level} • Created: {authority.createdDate}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="default">{authority.status}</Badge>
+                      <span className="text-sm text-muted-foreground">{authority.reportsCount} reports</span>
+                      <Button variant="ghost" size="icon" title="View Details">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default AuthorityDashboard;
