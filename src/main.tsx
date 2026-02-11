@@ -1,6 +1,10 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { initializeApiService } from "./utils/apiConfig";
+
+// Initialize API service with correct backend URL before rendering app
+initializeApiService();
 
 createRoot(document.getElementById("root")!).render(<App />);
 

@@ -11,18 +11,10 @@ const getBackendURL = () => {
     if (backendParam) {
       return decodeURIComponent(backendParam);
     }
-    
-    // If accessing from external device (not localhost), use the current host
-    const currentHost = window.location.hostname;
-    const currentPort = window.location.port;
-    
-    // If not localhost, construct backend URL using the same host but port 8000
-    if (currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
-      return `http://${currentHost}:8000`;
-    }
   }
   
-  // Fallback to environment variable or default
+  // Always use environment variable or default Render backend URL
+  // Never construct URLs dynamically for production - causes mixed content errors
   return import.meta.env.VITE_BACKEND_URL || 'https://pralay-backend-1.onrender.com';
 };
 

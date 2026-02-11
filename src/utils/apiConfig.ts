@@ -2,14 +2,16 @@ import { apiService } from '@/services/api';
 
 // Initialize API service with correct backend URL
 export const initializeApiService = () => {
+  let backendURL: string;
+  
   // Check if we're in browser environment
   if (typeof window !== 'undefined') {
     const urlParams = new URLSearchParams(window.location.search);
     const backendParam = urlParams.get('backend');
     
     if (backendParam) {
-      const backendURL = decodeURIComponent(backendParam);
-      console.log('🔗 Initializing API service with backend URL:', backendURL);
+      backendURL = decodeURIComponent(backendParam);
+      console.log('🔗 Initializing API service with backend URL from query param:', backendURL);
       apiService.updateBaseURL(backendURL);
       return backendURL;
     }
@@ -18,13 +20,17 @@ export const initializeApiService = () => {
   // Fallback to environment variable
   const envBackendURL = import.meta.env.VITE_BACKEND_URL;
   if (envBackendURL) {
-    console.log('🔗 Using environment backend URL:', envBackendURL);
-    apiService.updateBaseURL(envBackendURL);
-    return envBackendURL;
+    backendURL = envBackendURL;
+    console.log('🔗 Using environment backend URL:', backendURL);
+    apiService.updateBaseURL(backendURL);
+    return backendURL;
   }
   
-  console.log('🔗 Using default backend URL: https://pralay-backend-1.onrender.com');
-  return 'https://pralay-backend-1.onrender.com';
+  // Use default Render backend URL
+  backendURL = 'https://pralay-backend-1.onrender.com';
+  console.log('🔗 Using default backend URL:', backendURL);
+  apiService.updateBaseURL(backendURL);
+  return backendURL;
 };
 
 // Get current backend URL
