@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, MapPin, Upload, Wifi, WifiOff, Clock, Eye, X, MapPinIcon, Shield, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { apiService } from "@/services/api";
 
 const ReportHazard = () => {
   const { toast } = useToast();
@@ -84,7 +85,6 @@ const ReportHazard = () => {
             'User-Agent': 'OceanWatch-Sentinel/1.0',
             'Accept': 'application/json',
           },
-          credentials: "include",
         });
         const data = await response.json();
         
@@ -130,7 +130,6 @@ const ReportHazard = () => {
           headers: {
             'Accept': 'application/json',
           },
-          credentials: "include",
         });
         const data = await response.json();
         
@@ -165,7 +164,6 @@ const ReportHazard = () => {
           headers: {
             'Accept': 'application/json',
           },
-          credentials: "include",
         });
         const data = await response.json();
         
@@ -2076,28 +2074,31 @@ const ReportHazard = () => {
       });
       
       // Submit to backend
-      const response = await fetch('https://pralay-backend-1.onrender.com/api/submit-hazard-report/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Include session cookies for authentication
-        body: JSON.stringify(submissionData)
-      });
-      
-      const result = await response.json();
+      interface SubmitHazardResponse {
+        success: boolean;
+        report_id?: string;
+        data?: any;
+        message?: string;
+      }
+      const result = await apiService.makeRequest<SubmitHazardResponse>(
+        '/api/submit-hazard-report/',
+        {
+          method: 'POST',
+          body: JSON.stringify(submissionData),
+        }
+      );
       
       if (result.success) {
         toast({
           title: "Report submitted successfully!",
           description: `Report ID: ${result.report_id}. Your hazard report has been saved to the database.`,
         });
-        
-        // Log success details
+      
         console.log('Report submitted:', result.data);
       } else {
         throw new Error(result.message || 'Failed to submit report');
       }
+      
       
     } catch (error) {
       console.error('Error submitting report:', error);
