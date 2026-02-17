@@ -67,63 +67,64 @@ class ApiService {
     options: RequestInit = {},
     retryOnAuth = true
   ): Promise<T> {
+  
     const url = `${this.baseURL}${endpoint}`;
-    
-    // Check if the request body is FormData
     const isFormData = options.body instanceof FormData;
-
-    const token = this.getAuthToken();
-    const defaultHeaders: Record<string, string> = {
-      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-      'X-Requested-With': 'XMLHttpRequest',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-    };
-
-    const config: RequestInit = {
-      ...options,
-      credentials: 'omit', // Stateless token auth; no cookies
-      headers: {
-        ...defaultHeaders,
+  
+    const buildHeaders = () => {
+      const freshToken = localStorage.getItem('authToken');
+  
+      return {
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+        'X-Requested-With': 'XMLHttpRequest',
+        ...(freshToken ? { 'Authorization': `Bearer ${freshToken}` } : {}),
         ...options.headers,
-      },
+      };
     };
-
-    try {
-      const response = await fetch(url, config);
-      
-      // If unauthorized and we have a refresh token, try to refresh
-      if (response.status === 401 && retryOnAuth && this.getRefreshToken()) {
-        try {
-          await this.refreshToken();
-          // Retry the original request with new token
-          return this.request<T>(endpoint, options, false);
-        } catch (refreshError) {
-          // Refresh failed, clear auth and redirect to login
-          this.clearAuth();
-          window.location.href = '/';
-          throw new Error('Session expired. Please login again.');
-        }
+  
+    const makeFetch = async () => {
+      return fetch(url, {
+        ...options,
+        credentials: 'omit',
+        headers: buildHeaders(),
+      });
+    };
+  
+    let response = await makeFetch();
+  
+    // 🔥 If unauthorized, try refresh ONCE
+    if (response.status === 401 && retryOnAuth && this.getRefreshToken()) {
+      try {
+        console.log("🔄 Attempting token refresh...");
+        await this.refreshToken();
+  
+        // Retry with NEW token
+        response = await fetch(url, {
+          ...options,
+          credentials: 'omit',
+          headers: buildHeaders(), // 🔥 rebuild headers with NEW token
+        });
+  
+      } catch (refreshError) {
+        this.clearAuth();
+        window.location.href = '/';
+        throw new Error('Session expired. Please login again.');
       }
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.error || errorMessage;
-        } catch {
-          errorMessage = errorText || errorMessage;
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
     }
+  
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error || errorMessage;
+      } catch {}
+      throw new Error(errorMessage);
+    }
+  
+    return response.json();
   }
+  
 
   // Authentication methods
   async login(credentials: LoginRequest): Promise<AuthResponse> {
@@ -192,22 +193,27 @@ class ApiService {
     if (!refreshToken) {
       throw new Error('No refresh token available');
     }
-
-    const response = await this.request<AuthResponse>('/api/auth/refresh/', {
+  
+    const response = await fetch(`${this.baseURL}/api/auth/refresh/`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ refresh_token: refreshToken }),
     });
-
-    // Update stored tokens
-    if (response.token) {
-      localStorage.setItem('authToken', response.token);
+  
+    if (!response.ok) {
+      throw new Error("Refresh failed");
     }
-    if (response.user) {
-      localStorage.setItem('user', JSON.stringify(response.user));
+  
+    const data = await response.json();
+  
+    if (data.token) {
+      localStorage.setItem('authToken', data.token);
     }
-
-    return response;
-  }
+  
+    return data;
+  }  
 
   // OTP methods
   async sendOTP(email: string): Promise<{ success: boolean; message: string }> {
