@@ -72,25 +72,16 @@ class ApiService {
     // Check if the request body is FormData
     const isFormData = options.body instanceof FormData;
 
-    const defaultHeaders: Record<string, string> = {
-      // Set Content-Type ONLY if it's NOT FormData (browser handles multipart/form-data)
-      ...(isFormData ? {} : { 'Content-Type': 'application/json' }), 
-      'X-Requested-With': 'XMLHttpRequest',
-      'X-CSRFToken': this.getCsrfToken(),
-    };
-
-    // Note: We're using session-based authentication (cookies), not Bearer tokens
-    // The token is stored but not sent in headers - Django handles authentication via sessions
     const token = this.getAuthToken();
-    if (token) {
-      console.log('🔐 API Service: Token available but using session auth for', endpoint);
-    } else {
-      console.log('🔐 API Service: No auth token available for', endpoint);
-    }
+    const defaultHeaders: Record<string, string> = {
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+      'X-Requested-With': 'XMLHttpRequest',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    };
 
     const config: RequestInit = {
       ...options,
-      credentials: 'include', // Always include cookies for session authentication
+      credentials: 'omit', // Stateless token auth; no cookies
       headers: {
         ...defaultHeaders,
         ...options.headers,
