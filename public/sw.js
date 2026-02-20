@@ -1,7 +1,7 @@
 // Ocean Hazard Reporting Platform - Service Worker
 // Provides offline functionality and caching for PWA
 
-const CACHE_NAME = 'pralay-v2';
+const CACHE_NAME = 'pralay-v3';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
