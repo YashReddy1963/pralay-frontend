@@ -34,6 +34,7 @@ import {
   Languages,
   RotateCcw
 } from "lucide-react";
+import { useEffect,useState } from "react";
 
 // Import local images
 import LandingPage1 from "./images/LandingPage1.avif";
@@ -48,11 +49,54 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://10.216.34.122:80
 
 const Landing = () => {
 
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstall, setShowInstall] = useState(false);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if app is already installed
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true;
+  
+    if (isStandalone) {
+      setShowInstall(false);
+      return;
+    }
+  
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstall(true);
+    };
+  
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+  
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  //handle Install Click button
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+  
+    deferredPrompt.prompt();
+  
+    const choice = await deferredPrompt.userChoice;
+  
+    if (choice.outcome === "accepted") {
+      console.log("User installed PWA");
+    }
+  
+    setDeferredPrompt(null);
+    setShowInstall(false);
+  };
 
   // Create a smart QR code that provides access to both frontend and backend
   const qrValue = `${FRONTEND_URL}?connect=true&backend=${encodeURIComponent(BACKEND_URL)}`;
-
+  
   return (
     <TooltipProvider>
       <div className="min-h-screen relative">
@@ -126,13 +170,22 @@ const Landing = () => {
             
             {/* Right side - Auth buttons */}
             <div className="flex items-center space-x-3">
+              {showInstall && (
+                <Button
+                  onClick={handleInstallClick}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Install App
+                </Button>
+              )}
               <Button 
               variant="ghost" 
               className="text-slate-300 hover:bg-slate-800 hover:text-white"
               onClick={() => navigate("/signin")}>
                 Sign In
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => navigate("/signup")}>
                 Sign Up
               </Button>
             </div>
