@@ -140,20 +140,12 @@ const Landing = () => {
             {/* Left side - Logo and Government branding */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-              <img 
-  src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>" 
-  alt="Wave" 
-  style={{ width: "32px", height: "32px" }} 
-/>
-
+                <img 
+                  src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>" 
+                  alt="Wave" 
+                  style={{ width: "32px", height: "32px" }} 
+                />
                 <span className="text-xl font-bold text-white">Pralay</span>
-              </div>
-              <div className="hidden md:flex items-center space-x-2 text-slate-300">
-              <div className="flex items-center gap-2">
-      
- 
-     
-    </div>
               </div>
             </div>
             
@@ -169,35 +161,27 @@ const Landing = () => {
             </nav>
             
             {/* Right side - Auth buttons */}
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"
-                onClick={() => navigate("/signin")}
-              >
+            <div className="flex items-center space-x-1">
+              <Button 
+              variant="ghost" 
+              className="text-slate-300 hover:bg-slate-800 hover:text-white"
+              onClick={() => navigate("/signin")}>
                 Sign In
               </Button>
-
-              <Button
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap"
-                onClick={() => navigate("/signup")}
-              >
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => navigate("/signup")}>
                 Sign Up
               </Button>
-
               {showInstall && (
                 <Button
-                  size="sm"
                   onClick={handleInstallClick}
-                  className="bg-green-600 hover:bg-green-700 text-white whitespace-nowrap"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   Install App
                 </Button>
               )}
             </div>
-          </div>
+          </div>file:///home/yashreddy/Downloads/WhatsApp%20Image%202026-02-20%20at%206.41.30%20PM.jpeg
         </div>
       </header>
 
