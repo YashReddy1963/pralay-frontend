@@ -172,16 +172,8 @@ const Landing = () => {
               onClick={() => navigate("/signup")}>
                 Sign Up
               </Button>
-              {showInstall && (
-                <Button
-                  onClick={handleInstallClick}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Install App
-                </Button>
-              )}
             </div>
-          </div>file:///home/yashreddy/Downloads/WhatsApp%20Image%202026-02-20%20at%206.41.30%20PM.jpeg
+          </div>
         </div>
       </header>
 
@@ -678,6 +670,21 @@ const Landing = () => {
         </div>
       </footer>
       </div>
+      {showInstall && (
+        <div className="fixed bottom-6 right-6 z-[999]">
+          <button
+            onClick={handleInstallClick}
+            className="group relative w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+          >
+            <Smartphone className="text-white w-6 h-6" />
+            
+            {/* Tooltip label */}
+            <span className="absolute right-16 bg-slate-900 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              Install Pralay
+            </span>
+          </button>
+        </div>
+      )}
     </TooltipProvider>
   );
 };
