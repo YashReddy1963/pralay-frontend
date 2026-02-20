@@ -205,9 +205,25 @@ const Landing = () => {
                   Request Demo
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button size="lg" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white px-8 py-4">
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white px-8 py-4"
+                >
                   Explore Platform
                 </Button>
+
+                {showInstall && (
+                  <Button
+                    size="lg"
+                    onClick={handleInstallClick}
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold px-8 py-4 shadow-lg hover:scale-105 transition-transform"
+                  >
+                    <Smartphone className="mr-2 h-5 w-5" />
+                    Install App
+                  </Button>
+                )}
               </div>
               
               {/* Trust Bar */}
@@ -670,21 +686,6 @@ const Landing = () => {
         </div>
       </footer>
       </div>
-      {showInstall && (
-        <div className="fixed bottom-6 right-6 z-[999]">
-          <button
-            onClick={handleInstallClick}
-            className="group relative w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
-          >
-            <Smartphone className="text-white w-6 h-6" />
-            
-            {/* Tooltip label */}
-            <span className="absolute right-16 bg-slate-900 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-              Install Pralay
-            </span>
-          </button>
-        </div>
-      )}
     </TooltipProvider>
   );
 };
