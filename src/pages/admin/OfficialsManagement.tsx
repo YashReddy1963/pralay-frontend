@@ -303,18 +303,13 @@ const OfficialsManagement = () => {
       }
 
       // Fetch CSRF token first
-      const csrfToken = await apiService.fetchCsrfToken();
-      
-      // Use direct fetch for FormData with proper session handling
-      const response = await fetch('https://pralay-backend-1.onrender.com/api/create-authority/', {
-        method: 'POST',
-        body: submitData,
-        credentials: 'include',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': csrfToken,
-        },
-      });
+      const response = await apiService.makeRequest<any>(
+        '/api/create-authority/',
+        {
+          method: 'POST',
+          body: submitData, // FormData
+        }
+      );
 
       if (!response.ok) {
         let errorMessage = 'Failed to create authority';
