@@ -169,21 +169,29 @@ const Landing = () => {
             </nav>
             
             {/* Right side - Auth buttons */}
-            <div className="flex items-center space-x-1">
-              <Button 
-              variant="ghost" 
-              className="text-slate-300 hover:bg-slate-800 hover:text-white"
-              onClick={() => navigate("/signin")}>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"
+                onClick={() => navigate("/signin")}
+              >
                 Sign In
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => navigate("/signup")}>
+
+              <Button
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap"
+                onClick={() => navigate("/signup")}
+              >
                 Sign Up
               </Button>
+
               {showInstall && (
                 <Button
+                  size="sm"
                   onClick={handleInstallClick}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-green-600 hover:bg-green-700 text-white whitespace-nowrap"
                 >
                   Install App
                 </Button>
