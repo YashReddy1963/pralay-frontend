@@ -1,7 +1,7 @@
 // Ocean Hazard Reporting Platform - Service Worker
 // Provides offline functionality and caching for PWA
 
-importScripts('https://unpkg.com/idb/build/iife/index-min.js');
+importScripts('/idb.js');
 
 const dbPromise = idb.openDB('pralay-offline-db', 1, {
   upgrade(db) {
