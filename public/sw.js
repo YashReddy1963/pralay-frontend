@@ -21,9 +21,18 @@ async function removeOfflineReport(id) {
   await db.delete('reports', id);
 }
 
-const CACHE_NAME = 'pralay-v3';
+const CACHE_NAME = 'pralay-v4';
 
 self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll([
+        '/',
+        '/index.html',
+        '/offline.html',
+      ]);
+    })
+  );
   self.skipWaiting();
 });
 
@@ -78,37 +87,6 @@ async function syncReports() {
     }
   }
 }
-async function syncReports() {
-  try {
-    // Get offline reports from IndexedDB
-    const reports = await getOfflineReports();
-    
-    for (const report of reports) {
-      try {
-        // Attempt to submit each report
-        const response = await fetch('/api/reports', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: "include",
-          body: JSON.stringify(report)
-        });
-        
-        if (response.ok) {
-          // Remove successfully synced report from local storage
-          await removeOfflineReport(report.id);
-          console.log('Report synced:', report.id);
-        }
-      } catch (error) {
-        console.error('Failed to sync report:', report.id, error);
-      }
-    }
-  } catch (error) {
-    console.error('Error during background sync:', error);
-  }
-}
-
 
 
 // Push notification handling
@@ -157,11 +135,30 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        return caches.match('/offline.html');
-      })
-    );
-  }
+
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(event.request)
+        .then((networkResponse) => {
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        })
+        .catch(() => {
+          // If navigation fails, show offline page
+          if (event.request.mode === 'navigate') {
+            return caches.match('/offline.html');
+          }
+        });
+
+    })
+  );
 });
