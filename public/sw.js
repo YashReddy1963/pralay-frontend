@@ -1,6 +1,26 @@
 // Ocean Hazard Reporting Platform - Service Worker
 // Provides offline functionality and caching for PWA
 
+importScripts('https://unpkg.com/idb/build/iife/index-min.js');
+
+const dbPromise = idb.openDB('pralay-offline-db', 1, {
+  upgrade(db) {
+    if (!db.objectStoreNames.contains('reports')) {
+      db.createObjectStore('reports', { keyPath: 'id' });
+    }
+  },
+});
+
+async function getOfflineReports() {
+  const db = await dbPromise;
+  return db.getAll('reports');
+}
+
+async function removeOfflineReport(id) {
+  const db = await dbPromise;
+  await db.delete('reports', id);
+}
+
 const CACHE_NAME = 'pralay-v3';
 
 self.addEventListener('install', (event) => {
@@ -32,6 +52,33 @@ self.addEventListener('sync', (event) => {
 
 // Function to sync offline reports when connection is restored
 async function syncReports() {
+  const reports = await getOfflineReports();
+
+  for (const report of reports) {
+    try {
+      const response = await fetch(
+        'https://pralay-backend-1.onrender.com/api/submit-hazard-report/',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(report.data),
+          credentials: 'include',
+        }
+      );
+
+      if (response.ok) {
+        await removeOfflineReport(report.id);
+        console.log('Synced:', report.id);
+      }
+
+    } catch (err) {
+      console.log('Still offline. Will retry later.');
+    }
+  }
+}
+async function syncReports() {
   try {
     // Get offline reports from IndexedDB
     const reports = await getOfflineReports();
@@ -62,18 +109,7 @@ async function syncReports() {
   }
 }
 
-// Helper functions for IndexedDB operations (simplified)
-async function getOfflineReports() {
-  // In a real implementation, this would use IndexedDB
-  return JSON.parse(localStorage.getItem('offline-reports') || '[]');
-}
 
-async function removeOfflineReport(reportId) {
-  // In a real implementation, this would use IndexedDB
-  const reports = JSON.parse(localStorage.getItem('offline-reports') || '[]');
-  const filteredReports = reports.filter(report => report.id !== reportId);
-  localStorage.setItem('offline-reports', JSON.stringify(filteredReports));
-}
 
 // Push notification handling
 self.addEventListener('push', (event) => {

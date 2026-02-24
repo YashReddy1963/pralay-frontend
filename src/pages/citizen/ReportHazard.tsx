@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Camera, MapPin, Upload, Wifi, WifiOff, Clock, Eye, X, MapPinIcon, Shield, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiService } from "@/services/api";
+import { saveOfflineReport } from "@/utils/offlineDB";
 
 const ReportHazard = () => {
   const { toast } = useToast();
@@ -2080,6 +2081,32 @@ const ReportHazard = () => {
         data?: any;
         message?: string;
       }
+
+      // OFFLINE CHECK
+      if (!navigator.onLine) {
+      
+        const offlineReport = {
+          id: crypto.randomUUID(),
+          data: submissionData,
+          createdAt: Date.now(),
+        };
+      
+        await saveOfflineReport(offlineReport);
+      
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+          const reg = await navigator.serviceWorker.ready;
+          await reg.sync.register('background-sync-reports');
+        }
+      
+        toast({
+          title: "Saved Offline",
+          description: "Report will auto-submit when internet is available.",
+        });
+      
+        setIsSubmitting(false);
+        return;
+      }
+
       const result = await apiService.makeRequest<SubmitHazardResponse>(
         '/api/submit-hazard-report/',
         {
