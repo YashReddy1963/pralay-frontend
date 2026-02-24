@@ -71,16 +71,22 @@ async function syncReports() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': report.token ? `Token ${report.token}` : '',
           },
           body: JSON.stringify(report.data),
-          credentials: 'include',
         }
       );
-
-      if (response.ok) {
-        await removeOfflineReport(report.id);
-        console.log('Synced:', report.id);
+      
+      console.log("Response status:", response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log("Server rejected:", errorText);
+        continue;
       }
+      
+      await removeOfflineReport(report.id);
+      console.log("Synced:", report.id);
 
     } catch (err) {
       console.log('Still offline. Will retry later.');

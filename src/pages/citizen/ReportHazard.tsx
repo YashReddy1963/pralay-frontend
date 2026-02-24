@@ -2088,6 +2088,7 @@ const ReportHazard = () => {
         const offlineReport = {
           id: crypto.randomUUID(),
           data: submissionData,
+          token: localStorage.getItem("authToken"),
           createdAt: Date.now(),
         };
       
