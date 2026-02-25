@@ -72,7 +72,7 @@ async function syncReports() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': report.token ? `Token ${report.token}` : '',
+            'Authorization': report.token ? `Bearer ${report.token}` : '',
           },
           body: JSON.stringify(report.data),
         }
