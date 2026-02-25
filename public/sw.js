@@ -21,7 +21,7 @@ async function removeOfflineReport(id) {
   await db.delete('reports', id);
 }
 
-const CACHE_NAME = 'pralay-v5';
+const CACHE_NAME = 'pralay-v6';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -145,6 +145,13 @@ self.addEventListener('notificationclick', (event) => {
 
 self.addEventListener('fetch', (event) => {
 
+  const url = new URL(event.request.url);
+
+  // 🔥 DO NOT INTERCEPT BACKEND API CALLS
+  if (url.origin === 'https://pralay-backend-1.onrender.com') {
+    return;
+  }
+
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
@@ -163,7 +170,6 @@ self.addEventListener('fetch', (event) => {
           });
       })
       .catch(() => {
-        // Always return a valid Response
         if (event.request.mode === 'navigate') {
           return caches.match('/offline.html');
         }
