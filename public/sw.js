@@ -21,7 +21,7 @@ async function removeOfflineReport(id) {
   await db.delete('reports', id);
 }
 
-const CACHE_NAME = 'pralay-v4';
+const CACHE_NAME = 'pralay-v5';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -147,27 +147,31 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(event.request)
+      .then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
 
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      return fetch(event.request)
-        .then((networkResponse) => {
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, networkResponse.clone());
-            return networkResponse;
+        return fetch(event.request)
+          .then((networkResponse) => {
+            return caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, networkResponse.clone());
+              return networkResponse;
+            });
           });
-        })
-        .catch(() => {
-          // If navigation fails, show offline page
-          if (event.request.mode === 'navigate') {
-            return caches.match('/offline.html');
-          }
-        });
+      })
+      .catch(() => {
+        // Always return a valid Response
+        if (event.request.mode === 'navigate') {
+          return caches.match('/offline.html');
+        }
 
-    })
+        return new Response('', {
+          status: 503,
+          statusText: 'Service Unavailable',
+        });
+      })
   );
 });
 
