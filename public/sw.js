@@ -70,6 +70,7 @@ async function syncReports() {
         'https://pralay-backend-1.onrender.com/api/submit-hazard-report/',
         {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': report.token ? `Bearer ${report.token}` : '',

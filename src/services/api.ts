@@ -85,7 +85,7 @@ class ApiService {
     const makeFetch = async () => {
       return fetch(url, {
         ...options,
-        credentials: 'omit',
+        credentials: 'include',
         headers: buildHeaders(),
       });
     };
@@ -101,7 +101,7 @@ class ApiService {
         // Retry with NEW token
         response = await fetch(url, {
           ...options,
-          credentials: 'omit',
+          credentials: 'include',
           headers: buildHeaders(), // 🔥 rebuild headers with NEW token
         });
   
