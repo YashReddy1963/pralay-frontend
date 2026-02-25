@@ -65,6 +65,29 @@ const ReportHazard = () => {
     { value: "other", label: "Other Hazard" },
   ];
 
+  //auto the sync the offline reports.
+  useEffect(() => {
+    const triggerSync = async () => {
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        if (reg.active) {
+          reg.active.postMessage({ type: 'SYNC_REPORTS' });
+        }
+      }
+    };
+  
+    window.addEventListener('online', triggerSync);
+  
+    // Also trigger once when component mounts
+    if (navigator.onLine) {
+      triggerSync();
+    }
+  
+    return () => {
+      window.removeEventListener('online', triggerSync);
+    };
+  }, []);
+
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
       // Try multiple geocoding services for better accuracy

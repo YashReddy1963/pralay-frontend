@@ -63,6 +63,7 @@ self.addEventListener('sync', (event) => {
 async function syncReports() {
   const reports = await getOfflineReports();
 
+
   for (const report of reports) {
     try {
       const response = await fetch(
@@ -87,6 +88,7 @@ async function syncReports() {
       
       await removeOfflineReport(report.id);
       console.log("Synced:", report.id);
+      console.log("Manual or background sync triggered");
 
     } catch (err) {
       console.log('Still offline. Will retry later.');
@@ -167,4 +169,10 @@ self.addEventListener('fetch', (event) => {
 
     })
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SYNC_REPORTS') {
+    event.waitUntil(syncReports());
+  }
 });
