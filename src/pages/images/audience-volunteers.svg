@@ -1,0 +1,12 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" rx="24" fill="#E9FFF4"/>
+  <rect x="110" y="130" width="580" height="340" rx="28" fill="#C7F5DE"/>
+  <circle cx="230" cy="250" r="68" fill="#27AE60"/>
+  <circle cx="400" cy="250" r="68" fill="#6FCF97"/>
+  <circle cx="570" cy="250" r="68" fill="#219653"/>
+  <rect x="168" y="322" width="124" height="130" rx="20" fill="#27AE60"/>
+  <rect x="338" y="322" width="124" height="130" rx="20" fill="#6FCF97"/>
+  <rect x="508" y="322" width="124" height="130" rx="20" fill="#219653"/>
+  <path d="M390 165H410V210H455V230H410V275H390V230H345V210H390V165Z" fill="#145A32"/>
+  <text x="400" y="520" font-size="28" fill="#145A32" text-anchor="middle" font-family="Arial, sans-serif">Volunteer Support</text>
+</svg>

@@ -35,8 +35,18 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-depth flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card/95 backdrop-blur-sm border-white/20">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-primary/[0.10] via-background to-background p-4">
+      <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl" aria-hidden="true" />
+      <div className="absolute -bottom-28 -left-20 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl" aria-hidden="true" />
+
+      <div className="absolute inset-0 opacity-45" aria-hidden="true">
+        <svg viewBox="0 0 1200 500" className="h-full w-full" preserveAspectRatio="none">
+          <path d="M0,280 C200,180 420,370 650,275 C860,190 1020,230 1200,300 L1200,500 L0,500 Z" fill="hsl(var(--primary) / 0.18)" />
+          <path d="M0,330 C220,230 460,410 720,320 C900,255 1040,280 1200,360 L1200,500 L0,500 Z" fill="hsl(var(--primary) / 0.10)" />
+        </svg>
+      </div>
+
+      <Card className="relative z-10 w-full max-w-md border-white/20 bg-card/95 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
             <Shield className="h-12 w-12 text-primary-glow" />

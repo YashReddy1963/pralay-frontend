@@ -1,0 +1,11 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" rx="24" fill="#FFF6E8"/>
+  <rect x="100" y="320" width="140" height="190" rx="16" fill="#F2994A"/>
+  <rect x="260" y="250" width="160" height="260" rx="16" fill="#F2C94C"/>
+  <rect x="440" y="190" width="170" height="320" rx="16" fill="#F2994A"/>
+  <rect x="630" y="280" width="70" height="230" rx="14" fill="#F2C94C"/>
+  <rect x="280" y="120" width="240" height="50" rx="25" fill="#FDE2BC"/>
+  <text x="400" y="153" font-size="26" fill="#9C5A00" text-anchor="middle" font-family="Arial, sans-serif">District Authorities</text>
+  <path d="M170 430H770" stroke="#9C5A00" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="175" cy="430" r="22" fill="#9C5A00"/>
+</svg>

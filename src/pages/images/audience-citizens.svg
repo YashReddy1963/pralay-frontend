@@ -1,0 +1,11 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" rx="24" fill="#E8F1FF"/>
+  <circle cx="210" cy="240" r="72" fill="#2F80ED"/>
+  <rect x="130" y="320" width="160" height="180" rx="24" fill="#2F80ED"/>
+  <circle cx="400" cy="220" r="64" fill="#56CCF2"/>
+  <rect x="330" y="290" width="140" height="160" rx="20" fill="#56CCF2"/>
+  <circle cx="580" cy="250" r="72" fill="#2D9CDB"/>
+  <rect x="500" y="330" width="160" height="170" rx="24" fill="#2D9CDB"/>
+  <rect x="175" y="120" width="450" height="56" rx="28" fill="#B7D5FF"/>
+  <text x="400" y="156" font-size="28" fill="#11468F" text-anchor="middle" font-family="Arial, sans-serif">Citizens Reporting</text>
+</svg>
