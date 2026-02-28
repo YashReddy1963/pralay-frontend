@@ -12,11 +12,16 @@ import {
   BarChart3
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { apiService } from "@/services/api";
+import { useNavigate } from "react-router-dom";
 import { ResponsiveContainer, BarChart as RBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { useAdminLanguage } from "@/contexts/LanguageContext";
 
 const AdminDashboard = () => {
+
+
+  const navigate = useNavigate();
   const { t } = useAdminLanguage();
   const stats = [
     {
@@ -76,13 +81,102 @@ const AdminDashboard = () => {
     }
   ];
 
-  const regionalStats = [
-    { state: "Tamil Nadu", reports: 234, officials: 28 },
-    { state: "Maharashtra", reports: 189, officials: 24 },
-    { state: "Kerala", reports: 167, officials: 22 },
-    { state: "Gujarat", reports: 145, officials: 20 },
-    { state: "West Bengal", reports: 132, officials: 18 }
-  ];
+  // Default officials count for shown regions (kept from previous static data)
+  const defaultOfficialsMap: Record<string, number> = {
+    'Tamil Nadu':0,
+    'Maharashtra': 0,
+    'Kerala': 0,
+    'Gujarat': 0,
+    'West Bengal': 0,
+  };
+
+  const [regionalStats, setRegionalStats] = useState<{state: string; reports: number; officials: number;}[]>([
+    { state: "Tamil Nadu", reports: 0, officials: defaultOfficialsMap['Tamil Nadu'] },
+    { state: "Maharashtra", reports: 0, officials: defaultOfficialsMap['Maharashtra'] },
+    { state: "Kerala", reports: 0, officials: defaultOfficialsMap['Kerala'] },
+    { state: "Gujarat", reports: 0, officials: defaultOfficialsMap['Gujarat'] },
+    { state: "West Bengal", reports: 0, officials: defaultOfficialsMap['West Bengal'] }
+  ]);
+
+  // Fetch recent report counts per region (current month)
+  useEffect(() => {
+    const fetchRegionalCounts = async () => {
+      try {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10);
+        const end = new Date().toISOString().slice(0,10);
+
+        // Request recent reports for the current month. Use a reasonably large limit and filter on frontend.
+        const response = await apiService.getHazardReports({ limit: 1000, start_date: start, end_date: end } as any);
+
+        if (response && response.success) {
+          const reports = response.reports || [];
+
+          // Only count reports for the regions listed in the UI
+          const regions = Object.keys(defaultOfficialsMap);
+          const counts: Record<string, number> = {};
+          regions.forEach(r => counts[r] = 0);
+
+          reports.forEach((r: any) => {
+            const stateName = (r.location && r.location.state) || r.state || r.state_name || '';
+            if (!stateName) return;
+            // Normalize matching by simple contains (handles minor variations)
+            regions.forEach(region => {
+              if (stateName.toLowerCase().includes(region.toLowerCase())) {
+                counts[region] = (counts[region] || 0) + 1;
+              }
+            });
+          });
+          // Now fetch officials and count them per region as well
+          let officialsCounts: Record<string, number> = {};
+          regions.forEach(r => officialsCounts[r] = 0);
+
+          try {
+            const offResp = await apiService.getOfficials();
+            if (offResp && offResp.success) {
+              const officials = offResp.officials || offResp.data || [];
+              officials.forEach((o: any) => {
+                const stateName = o.state || o.state_name || (o.user && o.user.state) || '';
+                if (!stateName) return;
+                regions.forEach(region => {
+                  if (stateName.toLowerCase().includes(region.toLowerCase())) {
+                    officialsCounts[region] = (officialsCounts[region] || 0) + 1;
+                  }
+                });
+              });
+            } else {
+              // If official endpoint returns raw array
+              if (Array.isArray(offResp)) {
+                offResp.forEach((o: any) => {
+                  const stateName = o.state || o.state_name || (o.user && o.user.state) || '';
+                  if (!stateName) return;
+                  regions.forEach(region => {
+                    if (stateName.toLowerCase().includes(region.toLowerCase())) {
+                      officialsCounts[region] = (officialsCounts[region] || 0) + 1;
+                    }
+                  });
+                });
+              }
+            }
+          } catch (err) {
+            console.warn('Failed to fetch officials for regional stats', err);
+          }
+
+          const updated = regions.map(region => ({ state: region, reports: counts[region] || 0, officials: officialsCounts[region] || defaultOfficialsMap[region] || 0 }));
+
+          // Sort by reports descending so analytics show highest first
+          updated.sort((a,b) => b.reports - a.reports);
+          setRegionalStats(updated);
+        } else {
+          console.warn('Failed to fetch reports for regional stats', response);
+        }
+      } catch (err) {
+        console.error('Error fetching regional stats', err);
+      }
+    };
+
+    fetchRegionalCounts();
+  }, []);
 
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
@@ -111,7 +205,7 @@ const AdminDashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-semibold">{t("admin.dashboard.recentHazardReports")}</CardTitle>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => navigate("/admin/reports")}>
               <Eye className="h-4 w-4 mr-2" />
               View All
             </Button>
@@ -203,17 +297,17 @@ const AdminDashboard = () => {
             <CardTitle className="text-lg font-semibold">{t("admin.dashboard.quickActions")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full justify-start" variant="outline">
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate("/admin/officials")}>
               <Plus className="h-4 w-4 mr-2" />
               Register New Official
             </Button>
-            <Button className="w-full justify-start" variant="outline">
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate("/admin/settings")}>
               <AlertTriangle className="h-4 w-4 mr-2" />
-              Broadcast Emergency Alert
+              System Settings
             </Button>
-            <Button className="w-full justify-start" variant="outline">
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate("/admin/officials")}>
               <Activity className="h-4 w-4 mr-2" />
-              {t("admin.dashboard.systemHealthCheck")}
+              Add Officials
             </Button>
           </CardContent>
         </Card>

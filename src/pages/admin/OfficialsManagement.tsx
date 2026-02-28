@@ -32,6 +32,7 @@ import {
 import { useAdminLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { apiService } from "@/services/api";
+import { State, City } from "country-state-city";
 
 const OfficialsManagement = () => {
   const { t } = useAdminLanguage();
@@ -76,6 +77,29 @@ const OfficialsManagement = () => {
     can_manage_teams: false,
     service_card_proof: null as File | null
   });
+
+  //fetch state and city/district
+  const indianStates = State.getStatesOfCountry("IN");
+  const [districts, setDistricts] = useState<any[]>([]);
+  
+  //update districts according to state
+  useEffect(() => {
+    if (formData.state) {
+      const selectedState = indianStates.find(
+        (s) => s.name === formData.state
+      );
+  
+      if (selectedState) {
+        const stateDistricts = City.getCitiesOfState(
+          "IN",
+          selectedState.isoCode
+        );
+        setDistricts(stateDistricts);
+      }
+    } else {
+      setDistricts([]);
+    }
+  }, [formData.state]);
 
   const roleOptions = [
     { value: 'state_chairman', label: 'State Chairman' },
@@ -252,136 +276,129 @@ const OfficialsManagement = () => {
     return true;
   };
 
+  const resetForm = () => {
+    setFormData({
+      first_name: "",
+      middle_name: "",
+      last_name: "",
+      email: "",
+      phone_number: "",
+      password: "",
+      confirm_password: "",
+      role: "",
+      custom_role: "",
+      state: "",
+      district: "",
+      village: "",
+      nagar_panchayat: "",
+      current_designation: "",
+      government_service_id: "",
+      can_view_reports: false,
+      can_approve_reports: false,
+      can_manage_teams: false,
+      service_card_proof: null
+    });
+  
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+  
+    if (!validateForm()) return;
+  
     setIsLoading(true);
+  
     try {
-      // Create FormData for file upload
       const submitData = new FormData();
-      submitData.append('first_name', formData.first_name);
+  
+      submitData.append("first_name", formData.first_name);
       if (formData.middle_name.trim()) {
-        submitData.append('middle_name', formData.middle_name);
+        submitData.append("middle_name", formData.middle_name);
       }
-      submitData.append('last_name', formData.last_name);
-      submitData.append('email', formData.email);
-      submitData.append('phone_number', formData.phone_number);
-      submitData.append('password1', formData.password);
-      submitData.append('password2', formData.confirm_password);
-      submitData.append('role', formData.role);
+      submitData.append("last_name", formData.last_name);
+      submitData.append("email", formData.email);
+      submitData.append("phone_number", formData.phone_number);
+      submitData.append("password1", formData.password);
+      submitData.append("password2", formData.confirm_password);
+      submitData.append("role", formData.role);
+  
       if (formData.custom_role.trim()) {
-        submitData.append('custom_role', formData.custom_role);
+        submitData.append("custom_role", formData.custom_role);
       }
       if (formData.state.trim()) {
-        submitData.append('state', formData.state);
+        submitData.append("state", formData.state);
       }
       if (formData.district.trim()) {
-        submitData.append('district', formData.district);
+        submitData.append("district", formData.district);
       }
       if (formData.village.trim()) {
-        submitData.append('village', formData.village);
+        submitData.append("village", formData.village);
       }
       if (formData.nagar_panchayat.trim()) {
-        submitData.append('nagar_panchayat', formData.nagar_panchayat);
+        submitData.append("nagar_panchayat", formData.nagar_panchayat);
       }
       if (formData.current_designation.trim()) {
-        submitData.append('current_designation', formData.current_designation);
+        submitData.append("current_designation", formData.current_designation);
       }
       if (formData.government_service_id.trim()) {
-        submitData.append('government_service_id', formData.government_service_id);
+        submitData.append("government_service_id", formData.government_service_id);
       }
-      submitData.append('can_view_reports', formData.can_view_reports.toString());
-      submitData.append('can_approve_reports', formData.can_approve_reports.toString());
-      submitData.append('can_manage_teams', formData.can_manage_teams.toString());
-
+  
+      submitData.append("can_view_reports", String(formData.can_view_reports));
+      submitData.append("can_approve_reports", String(formData.can_approve_reports));
+      submitData.append("can_manage_teams", String(formData.can_manage_teams));
+  
       if (formData.service_card_proof) {
-        submitData.append('service_card_proof', formData.service_card_proof);
+        submitData.append("service_card_proof", formData.service_card_proof);
       }
-
-      // Fetch CSRF token first
-      const response = await apiService.makeRequest<any>(
-        '/api/create-authority/',
+  
+      // ✅ IMPORTANT: apiService already parses JSON
+      const data = await apiService.makeRequest<any>(
+        "/api/create-authority/",
         {
-          method: 'POST',
-          body: submitData, // FormData
+          method: "POST",
+          body: submitData,
         }
       );
-
-      if (!response.ok) {
-        let errorMessage = 'Failed to create authority';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
-          if (errorData.errors) {
-            const errorMessages = Object.values(errorData.errors).flat() as string[];
-            errorMessage = `Validation errors: ${errorMessages.join(', ')}`;
-            
-            // Check for common errors and provide helpful messages
-            if (errorMessages.some(msg => msg.includes('already exists'))) {
-              errorMessage = 'This email address is already registered. Please use a different email.';
-            } else if (errorMessages.some(msg => msg.includes('Phone number'))) {
-              errorMessage = 'Phone number must be exactly 10 digits.';
-            } else if (errorMessages.some(msg => msg.includes('too similar'))) {
-              errorMessage = 'Password is too similar to your name. Please use a different password.';
-            } else if (errorMessages.some(msg => msg.includes('required'))) {
-              errorMessage = 'Please fill in all required fields.';
-            }
-          }
-        } catch {
-          const errorText = await response.text();
-          if (response.status === 401 || errorText.includes('Authentication required')) {
-            errorMessage = 'Session expired. Please login again.';
-            localStorage.removeItem('user');
-            localStorage.removeItem('authToken');
-            toast.error('Session expired. Redirecting to login...');
-            setTimeout(() => window.location.href = '/signin', 2000);
-            return;
-          } else if (response.status === 403 || errorText.includes('Access denied')) {
-            errorMessage = 'You do not have permission to create authorities';
-          } else if (response.status === 400) {
-            errorMessage = 'Invalid form data. Please check all fields.';
-          } else {
-            errorMessage = `Server error (${response.status}): ${errorText.substring(0, 100)}...`;
-          }
-        }
-        throw new Error(errorMessage);
+  
+      // ✅ SUCCESS CASE
+      if (data.success) {
+        toast.success(data.message || "Authority created successfully!");
+  
+        resetForm();
+        await fetchOfficials();
+        setActiveTab("list");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } 
+      // ✅ BACKEND VALIDATION ERROR
+      else if (data.errors) {
+        let messages: string[] = [];
+  
+        Object.keys(data.errors).forEach((field) => {
+          const errorsArray = Array.isArray(data.errors[field])
+            ? data.errors[field]
+            : [data.errors[field]];
+  
+          errorsArray.forEach((err: string) => {
+            const cleanField = field
+              .replace("password1", "Password")
+              .replace("password2", "Confirm Password")
+              .replace("_", " ");
+  
+            messages.push(`${cleanField}: ${err}`);
+          });
+        });
+  
+        throw new Error(messages.join(" | "));
+      } 
+      else {
+        throw new Error(data.error || "Failed to create authority.");
       }
-
-      const data = await response.json();
-      toast.success(data.message || "Authority created successfully!");
-      setActiveTab("list");
-      
-      // Refresh the officials list
-      await fetchOfficials();
-      
-      // Reset form
-      setFormData({
-        first_name: "",
-        middle_name: "",
-        last_name: "",
-        email: "",
-        phone_number: "",
-        password: "",
-        confirm_password: "",
-        role: "",
-        custom_role: "",
-        state: "",
-        district: "",
-        village: "",
-        nagar_panchayat: "",
-        current_designation: "",
-        government_service_id: "",
-        can_view_reports: false,
-        can_approve_reports: false,
-        can_manage_teams: false,
-        service_card_proof: null
-      });
+  
     } catch (error: any) {
-      toast.error(error.message || "Failed to create authority. Please try again.");
+      toast.error(error.message || "Failed to create authority.");
       console.error("Create authority error:", error);
     } finally {
       setIsLoading(false);
@@ -737,22 +754,45 @@ const OfficialsManagement = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="state">State</Label>
-                      <Input
-                        id="state"
-                        value={formData.state}
-                        onChange={(e) => setFormData({...formData, state: e.target.value})}
-                        placeholder="Enter state"
-                      />
+                        <Select
+                          value={formData.state}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, state: value, district: "" })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select State" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {indianStates.map((state) => (
+                              <SelectItem key={state.isoCode} value={state.name}>
+                                {state.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                     </div>
                     
                     <div className="space-y-2">
                       <Label htmlFor="district">District</Label>
-                      <Input
-                        id="district"
-                        value={formData.district}
-                        onChange={(e) => setFormData({...formData, district: e.target.value})}
-                        placeholder="Enter district"
-                      />
+                        <Select
+                          value={formData.district}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, district: value })
+                          }
+                          disabled={!formData.state}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select District" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {districts.map((district) => (
+                              <SelectItem key={district.name} value={district.name}>
+                                {district.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                     </div>
                     
                     <div className="space-y-2">
@@ -811,6 +851,7 @@ const OfficialsManagement = () => {
                     <div className="flex items-center space-x-4">
                       <Button type="button" variant="outline" className="relative">
                         <input
+                          key={formData.service_card_proof ? formData.service_card_proof.name : "empty"}
                           type="file"
                           accept="image/*,.pdf"
                           onChange={handleFileUpload}
