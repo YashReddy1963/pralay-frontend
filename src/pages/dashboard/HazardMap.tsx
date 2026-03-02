@@ -255,7 +255,7 @@ const HazardMap = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">{t("official.hazardMap.discarded")}</p>
+                <p className="text-sm font-medium text-muted-foreground">Reports Discarded</p>
                 <p className="text-2xl font-bold text-red-600">
                   {loading ? "..." : reports.filter(r => r.status === "discarded").length}
                 </p>

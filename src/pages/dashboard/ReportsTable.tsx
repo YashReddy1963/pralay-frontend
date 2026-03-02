@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +38,8 @@ import {
 import { ReportDetailsModal } from "@/components/modals/ReportDetailsModal";
 import EditReportModal from "@/components/modals/EditReportModal";
 import { useOfficialLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { apiService } from "@/services/api";
 
 const ReportsTable = () => {
   const { t } = useOfficialLanguage();
@@ -51,79 +53,55 @@ const ReportsTable = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [activeReport, setActiveReport] = useState<any | null>(null);
 
-  // Mock data
-  const reports = [
-    {
-      id: "R001",
-      type: "High Waves",
-      location: "Santa Monica Beach, CA",
-      reportedBy: "Sarah Johnson",
-      source: "Citizen",
-      date: "2024-01-15",
-      time: "14:30",
-      status: "verified" as const,
-      severity: "High",
-      images: 2,
-      description: "Dangerous waves hitting the shoreline, estimated 4-5 meters high",
-      assignedTo: "Officer Martinez",
-    },
-    {
-      id: "R002",
-      type: "Marine Debris",
-      location: "Malibu Coast, CA",
-      reportedBy: "Mike Chen",
-      source: "Citizen",
-      date: "2024-01-14",
-      time: "09:15",
-      status: "pending" as const,
-      severity: "Medium",
-      images: 3,
-      description: "Large plastic debris washing ashore, potential navigation hazard",
-      assignedTo: "Officer Smith",
-    },
-    {
-      id: "R003",
-      type: "Storm Surge",
-      location: "Venice Beach, CA",
-      reportedBy: "@OceanWatch",
-      source: "Social Media",
-      date: "2024-01-13",
-      time: "16:45",
-      status: "verified" as const,
-      severity: "High",
-      images: 1,
-      description: "Storm surge affecting coastal infrastructure",
-      assignedTo: "Officer Johnson",
-    },
-    {
-      id: "R004",
-      type: "Water Pollution",
-      location: "Redondo Beach, CA",
-      reportedBy: "Lisa Martinez",
-      source: "Citizen",
-      date: "2024-01-12",
-      time: "11:20",
-      status: "discarded" as const,
-      severity: "Low",
-      images: 4,
-      description: "Discolored water observed near pier - determined to be algae bloom",
-      assignedTo: "Officer Davis",
-    },
-    {
-      id: "R005",
-      type: "Coastal Flooding",
-      location: "Manhattan Beach, CA",
-      reportedBy: "Tom Wilson",
-      source: "Citizen",
-      date: "2024-01-11",
-      time: "08:00",
-      status: "pending" as const,
-      severity: "Medium",
-      images: 5,
-      description: "Parking lot flooded during high tide, affecting beach access",
-      assignedTo: "Officer Brown",
-    },
-  ];
+  // Reports fetched from backend (or mock fallback)
+  const [reports, setReports] = useState<any[]>([]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        // Always fetch reports from the backend and rely on server-side
+        // role/jurisdiction enforcement. Do not pass client-side state
+        // filters or attempt defensive filtering here.
+        const resp = await apiService.getHazardReports({ limit: 1000 } as any);
+        if (resp && resp.success) {
+          const server = resp.reports || [];
+          setReports(server.map((r: any) => mapServerToRow(r)));
+        } else {
+          // fallback: leave reports empty
+          setReports([]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch reports', err);
+        setReports([]);
+      }
+    };
+
+    fetchReports();
+  }, [user]);
+
+  const mapServerToRow = (r: any) => {
+    const reportedAt = r.reported_at || r.reportedAt || r.created_at || r.reportedAt;
+    const dateObj = reportedAt ? new Date(reportedAt) : null;
+    const date = dateObj ? dateObj.toISOString().slice(0,10) : (r.date || '');
+    const time = dateObj ? dateObj.toISOString().slice(11,16) : (r.time || '');
+    const location = r.location?.full_location || [r.location?.city, r.location?.district, r.location?.state].filter(Boolean).join(', ') || r.city || r.state || '';
+    const severity = r.emergency_level ? (r.emergency_level.charAt(0).toUpperCase() + r.emergency_level.slice(1)) : (r.severity || '');
+    return {
+      id: r.report_id || r.id || r.reportId,
+      type: r.hazard_type_display || r.hazard_type || r.type || 'Unknown',
+      location,
+      reportedBy: (r.reported_by && (r.reported_by.name || `${r.reported_by.first_name || ''} ${r.reported_by.last_name || ''}`)) || r.reporter || 'Unknown',
+      source: r.source || r.reporterType || '',
+      date,
+      time,
+      status: (r.status || 'pending'),
+      severity,
+      images: r.images_count || (r.images && r.images.length) || 0,
+      description: r.description || '',
+      assignedTo: (r.reviewed_by && (r.reviewed_by.name || r.reviewed_by.email)) || r.assigned_to || '',
+    };
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -478,8 +456,8 @@ const ReportsTable = () => {
       </div>
       <ReportDetailsModal
         report={activeReport}
-        open={detailsOpen}
-        onOpenChange={setDetailsOpen}
+        isOpen={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
       />
       <EditReportModal
         report={activeReport}
