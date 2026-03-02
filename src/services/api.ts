@@ -331,6 +331,19 @@ class ApiService {
     });
   }
 
+  async getAuthorityInfo(): Promise<any> {
+    return this.request('/api/authority-info/', {
+      method: 'GET',
+    });
+  }
+
+  async createTeamMember(formData: FormData): Promise<any> {
+    return this.request('/api/create-team-member/', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
   async removeTeamMember(memberId: number): Promise<any> {
     return this.request(`/api/authority/team-members/${memberId}/remove/`, {
       method: 'DELETE',

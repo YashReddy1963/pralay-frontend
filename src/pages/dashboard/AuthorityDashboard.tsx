@@ -39,29 +39,36 @@ const AuthorityDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Redirect district chairmen and other sub-authorities away from this page
+  // Authority capability flags from backend
+  const [capabilities, setCapabilities] = useState({
+    can_create_sub_authority: false,
+    can_create_team_member: false,
+    can_create_sub_authority_team_member: false,
+  });
+
+  // Redirect users who are NOT state/district chairmen away from this page
   useEffect(() => {
-    if (user && user.role !== 'state_chairman') {
-      // Redirect to main dashboard for district chairmen and other roles
+    if (user && !(user.role === 'state_chairman' || user.role === 'district_chairman')) {
       navigate('/dashboard');
     }
   }, [user, navigate]);
 
-  // Don't render anything if user is not state chairman
-  if (!user || user.role !== 'state_chairman') {
+  // Don't render anything if user is not state or district chairman
+  if (!user || (user.role !== 'state_chairman' && user.role !== 'district_chairman')) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Access Restricted</h2>
-          <p className="text-muted-foreground">This page is only available for State Chairman.</p>
+          <p className="text-muted-foreground">This page is only available for State or District Chairman.</p>
         </div>
       </div>
     );
   }
 
-  // Role-based access control
-  const canManageAuthorities = user?.role === 'state_chairman';
-  const canManageTeam = user?.role === 'state_chairman'; // Only state chairman can access this page
+  // Role-based access control (backend-driven)
+  const canManageAuthorities = capabilities.can_create_sub_authority;
+  const canManageTeam = capabilities.can_create_team_member; // top-level team members (state level)
+  const canManageSubAuthorityTeam = capabilities.can_create_sub_authority_team_member; // district level
   const isTeamMember = false; // Team members can't access this page
 
   // Mock data for team members
@@ -202,9 +209,61 @@ const AuthorityDashboard = () => {
 
   // Fetch sub-authority team members data (not needed since only state chairman can access)
   const fetchSubAuthorityTeamMembers = async () => {
-    // This function is no longer needed since only state chairman can access this page
-    return;
+    if (!canManageSubAuthorityTeam) return;
+
+    try {
+      setIsLoadingSubAuthorityTeamMembers(true);
+      const resp = await apiService.getSubAuthorityTeamMembers();
+      if (resp && resp.success) {
+        setSubAuthorityTeamMembersData(resp.team_members || []);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to fetch sub-authority team members');
+      console.error('Fetch sub-authority team members error:', err);
+    } finally {
+      setIsLoadingSubAuthorityTeamMembers(false);
+    }
   };
+
+  // Fetch authority capability flags and initial data
+  useEffect(() => {
+    const loadAuthorityInfo = async () => {
+      try {
+        const resp = await apiService.getAuthorityInfo();
+        if (resp && resp.success && resp.authority) {
+          const auth = resp.authority;
+          setCapabilities({
+            can_create_sub_authority: !!auth.can_create_sub_authority,
+            can_create_team_member: !!auth.can_create_team_member,
+            can_create_sub_authority_team_member: !!auth.can_create_sub_authority_team_member,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch authority info', err);
+      }
+    };
+
+    loadAuthorityInfo();
+  }, [user]);
+
+  // When capabilities change, load the appropriate lists
+  useEffect(() => {
+    if (capabilities.can_create_team_member) {
+      fetchTeamMembers();
+    }
+    if (capabilities.can_create_sub_authority_team_member) {
+      fetchSubAuthorityTeamMembers();
+    }
+    // Also load authority sub-authorities for state chair
+    if (capabilities.can_create_sub_authority) {
+      // existing API to fetch sub-authorities
+      apiService.getAuthoritySubAuthorities().then((resp) => {
+        if (resp && resp.success) {
+          // optional: set subordinateAuthoritiesData if we had state; currently uses mock
+        }
+      }).catch(() => {});
+    }
+  }, [capabilities]);
 
   // Handle team member creation
   const handleTeamSubmit = async () => {
@@ -217,13 +276,21 @@ const AuthorityDashboard = () => {
       formData.append('email', teamMemberForm.email);
       formData.append('phone_number', teamMemberForm.phone_number);
       formData.append('designation', teamMemberForm.designation);
-      formData.append('state', teamMemberForm.state);
+  formData.append('state', teamMemberForm.state);
       formData.append('district', teamMemberForm.district);
       formData.append('password1', teamMemberForm.password1);
       formData.append('password2', teamMemberForm.password2);
       
-      // Use the available API method for creating sub-authority team members
-      const response = await apiService.createSubAuthorityTeamMember(formData);
+      // Choose API endpoint based on capability: top-level team member (state) vs sub-authority team member (district)
+      let response: any = { success: false };
+      if (capabilities.can_create_team_member) {
+        response = await apiService.createTeamMember(formData as any);
+      } else if (capabilities.can_create_sub_authority_team_member) {
+        response = await apiService.createSubAuthorityTeamMember(formData as any);
+      } else {
+        toast.error('You do not have permission to create team members');
+        return;
+      }
       if (response.success) {
         toast.success(response.message);
         setIsTeamModalOpen(false);
@@ -387,7 +454,9 @@ const AuthorityDashboard = () => {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="team">Team Management</TabsTrigger>
-          <TabsTrigger value="authorities">Subordinate Authorities</TabsTrigger>
+          {capabilities.can_create_sub_authority && (
+            <TabsTrigger value="authorities">Subordinate Authorities</TabsTrigger>
+          )}
         </TabsList>
 
         {/* Overview Tab */}
@@ -458,12 +527,22 @@ const AuthorityDashboard = () => {
                 <span>Team Members</span>
               </CardTitle>
               <Dialog open={isTeamModalOpen} onOpenChange={setIsTeamModalOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-purple-600 hover:bg-purple-700">
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Add Team Member
-                  </Button>
-                </DialogTrigger>
+                {capabilities.can_create_team_member && (
+                  <DialogTrigger asChild>
+                    <Button className="bg-purple-600 hover:bg-purple-700">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add Team Member
+                    </Button>
+                  </DialogTrigger>
+                )}
+                {capabilities.can_create_sub_authority_team_member && (
+                  <DialogTrigger asChild>
+                    <Button className="bg-purple-600 hover:bg-purple-700">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add Sub-Authority Team Member
+                    </Button>
+                  </DialogTrigger>
+                )}
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Create Team Member</DialogTitle>
@@ -718,12 +797,14 @@ const AuthorityDashboard = () => {
                 <span>Subordinate Authorities</span>
               </CardTitle>
               <Dialog open={isAuthorityModalOpen} onOpenChange={setIsAuthorityModalOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-blue-600 hover:bg-blue-700">
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Create Authority
-                  </Button>
-                </DialogTrigger>
+                {capabilities.can_create_sub_authority && (
+                  <DialogTrigger asChild>
+                    <Button className="bg-blue-600 hover:bg-blue-700">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Create Authority
+                    </Button>
+                  </DialogTrigger>
+                )}
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Create Subordinate Authority</DialogTitle>
