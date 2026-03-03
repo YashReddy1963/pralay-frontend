@@ -146,8 +146,59 @@ const AuthorityDashboard = () => {
   // Modal states
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [isAuthorityModalOpen, setIsAuthorityModalOpen] = useState(false);
-  const [selectedTeamMember, setSelectedTeamMember] = useState<any>(null);
-  const [selectedSubAuthority, setSelectedSubAuthority] = useState<any>(null);
+  // Type-safe selected items
+  interface TeamMember {
+    id?: number;
+    first_name?: string | null;
+    middle_name?: string | null;
+    last_name?: string | null;
+    email?: string | null;
+    phone_number?: string | null;
+    designation?: string | null;
+    state?: string | null;
+    district?: string | null;
+    nagar_panchayat?: string | null;
+    village?: string | null;
+    address?: string | null;
+    government_service_id?: string | null;
+    can_view_reports?: boolean | null;
+    can_approve_reports?: boolean | null;
+    can_manage_teams?: boolean | null;
+    assigned_date?: string | null;
+    is_active?: boolean | null;
+    [key: string]: any;
+  }
+
+  interface SubAuthority {
+    id?: number;
+    first_name?: string | null;
+    middle_name?: string | null;
+    last_name?: string | null;
+    email?: string | null;
+    phone_number?: string | null;
+    designation?: string | null;
+    role?: string | null;
+    state?: string | null;
+    district?: string | null;
+    nagar_panchayat?: string | null;
+    village?: string | null;
+    address?: string | null;
+    government_service_id?: string | null;
+    created_date?: string | null;
+    status?: string | null;
+    reportsCount?: number | null;
+    location?: {
+      state?: string | null;
+      district?: string | null;
+      village?: string | null;
+      nagar_panchayat?: string | null;
+      [key: string]: any;
+    } | null;
+    [key: string]: any;
+  }
+
+  const [selectedTeamMember, setSelectedTeamMember] = useState<TeamMember | null>(null);
+  const [selectedSubAuthority, setSelectedSubAuthority] = useState<SubAuthority | null>(null);
   const [isTeamMemberDetailOpen, setIsTeamMemberDetailOpen] = useState(false);
   const [isSubAuthorityDetailOpen, setIsSubAuthorityDetailOpen] = useState(false);
 
@@ -216,9 +267,15 @@ const AuthorityDashboard = () => {
   const fetchSubAuthorities = async () => {
     if (!isStateChairman) return;
     try {
-      const resp = await apiService.getSubAuthorities();
-      if (resp.success) {
-        setSubAuthoritiesData(resp.sub_authorities || []);
+      const response = await apiService.getSubAuthorities();
+      if (response.success) {
+         setSubAuthoritiesData(
+            response.sub_authorities.sort(
+               (a, b) =>
+                  new Date(b.created_date).getTime() -
+                  new Date(a.created_date).getTime()
+            )
+         );
       }
     } catch (error: any) {
       console.error('Failed to fetch subordinate authorities', error);
@@ -394,6 +451,51 @@ const AuthorityDashboard = () => {
     }
   }, [user?.role]);
 
+  // Helpers for rendering values
+  const displayText = (val?: string | null) => {
+    if (val === null || val === undefined) return "Not Provided";
+    if (typeof val === "string" && val.trim() === "") return "Not Provided";
+    return val;
+  };
+
+  const displayBool = (val?: boolean | null) => {
+    if (val === true) return "Yes";
+    if (val === false) return "No";
+    return "Not Provided";
+  };
+
+  const formatFullName = (obj: any) => {
+    if (!obj) return "Not Provided";
+    const parts = [obj.first_name, obj.middle_name, obj.last_name].filter((p) => p && String(p).trim() !== "");
+    if (parts.length) return parts.join(" ");
+    // Fallback to a single 'name' field if present
+    if (obj.name && String(obj.name).trim() !== "") return String(obj.name);
+    return "Not Provided";
+  };
+
+  const formatLocation = (obj: any) => {
+    if (!obj) return "Not Provided";
+    // Prefer nested location object if present
+    const loc = obj.location || {};
+    const village = loc.village ?? obj.village;
+    const nagar = loc.nagar_panchayat ?? obj.nagar_panchayat;
+    const district = loc.district ?? obj.district;
+    const state = loc.state ?? obj.state;
+    const parts = [village, nagar, district, state].filter((p) => p && String(p).trim() !== "");
+    return parts.length ? parts.join(", ") : "Not Provided";
+  };
+
+  const formatDate = (val?: string | null) => {
+    if (!val) return "Not Provided";
+    try {
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return String(val);
+      return d.toLocaleString();
+    } catch (e) {
+      return String(val);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -490,20 +592,22 @@ const AuthorityDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {teamMembers.slice(0, 3).map((member) => (
+                  {teamMembersData.slice(0, 3).map((member) => (
                     <div key={member.id} className="flex items-center space-x-4">
                       <Avatar>
                         <AvatarFallback>
-                          {member.name.split(' ').map((n: string) => n[0]).join('')}
+                          {member.first_name?.[0]}
+                          {member.last_name?.[0]}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-medium">{member.name}</p>
-                        <p className="text-sm text-muted-foreground">{member.role}</p>
+                        <p className="font-medium">
+                          {member.first_name} {member.last_name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {member.designation}
+                        </p>
                       </div>
-                      <Badge variant={member.status === 'Active' ? 'default' : 'secondary'}>
-                        {member.status}
-                      </Badge>
                     </div>
                   ))}
                 </div>
@@ -519,15 +623,26 @@ const AuthorityDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {(subAuthoritiesData.length ? subAuthoritiesData : []).map((authority) => (
-                    <div key={authority.id} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{authority.name}</p>
-                        <p className="text-sm text-muted-foreground">{authority.location}</p>
-                      </div>
-                      <div className="text-right">
-                        <Badge variant="default">{authority.status}</Badge>
-                        <p className="text-sm text-muted-foreground mt-1">{authority.reportsCount} reports</p>
+                  {subAuthoritiesData.map((authority) => (
+                    <div key={authority.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarFallback>
+                            {authority.first_name?.[0]}
+                            {authority.last_name?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">
+                            {authority.first_name} {authority.last_name}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {authority.role}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {authority.state}, {authority.district}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -963,20 +1078,20 @@ const AuthorityDashboard = () => {
                     <div className="flex items-center space-x-3">
                       <Avatar>
                         <AvatarFallback>
-                          {authority.name.split(' ').map((n: string) => n[0]).join('')}
+                          {String(formatFullName(authority)).split(' ').map((n: string) => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{authority.name}</p>
-                        <p className="text-sm text-muted-foreground">{authority.location}</p>
+                        <p className="font-medium">{formatFullName(authority)}</p>
+                        <p className="text-sm text-muted-foreground">{formatLocation(authority)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {authority.level} • Created: {authority.createdDate}
+                          {displayText(authority.role ?? authority.level)} • Created: {formatDate(authority.created_date ?? authority.createdDate)}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Badge variant="default">{authority.status}</Badge>
-                      <span className="text-sm text-muted-foreground">{authority.reportsCount} reports</span>
+                      <Badge variant="default">{displayText(authority.status)}</Badge>
+                      <span className="text-sm text-muted-foreground">{authority.reportsCount ?? authority.reports_count ?? "Not Provided"} reports</span>
                       <Button variant="ghost" size="icon" title="View Details" onClick={() => handleViewSubAuthorityDetails(authority)}>
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -996,36 +1111,83 @@ const AuthorityDashboard = () => {
           <DialogHeader>
             <DialogTitle>Team Member Details</DialogTitle>
           </DialogHeader>
-          {selectedTeamMember && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Name</Label>
-                  <p className="font-medium">{selectedTeamMember.first_name} {selectedTeamMember.last_name}</p>
+            {selectedTeamMember && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Name</Label>
+                    <p className="font-medium">{formatFullName(selectedTeamMember)}</p>
+                  </div>
+                  <div>
+                    <Label>Email</Label>
+                    <p className="font-medium">{displayText(selectedTeamMember.email)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Designation</Label>
+                    <p className="font-medium">{displayText(selectedTeamMember.designation)}</p>
+                  </div>
+                  <div>
+                    <Label>Phone</Label>
+                    <p className="font-medium">{displayText(selectedTeamMember.phone_number)}</p>
+                  </div>
+
+                  <div>
+                    <Label>State</Label>
+                    <p className="font-medium">{displayText(selectedTeamMember.state)}</p>
+                  </div>
+                  <div>
+                    <Label>District</Label>
+                    <p className="font-medium">{displayText(selectedTeamMember.district)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Nagar Panchayat</Label>
+                    <p className="font-medium">{displayText(selectedTeamMember.nagar_panchayat)}</p>
+                  </div>
+                  <div>
+                    <Label>Village</Label>
+                    <p className="font-medium">{displayText(selectedTeamMember.village)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Address</Label>
+                    <p className="font-medium">{displayText(selectedTeamMember.address)}</p>
+                  </div>
+                  <div>
+                    <Label>Government Service ID</Label>
+                    <p className="font-medium">{displayText(selectedTeamMember.government_service_id)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Assigned Date</Label>
+                    <p className="font-medium">{formatDate(selectedTeamMember.assigned_date)}</p>
+                  </div>
+                  <div>
+                    <Label>Active</Label>
+                    <p className="font-medium">{displayBool(selectedTeamMember.is_active)}</p>
+                  </div>
                 </div>
+
                 <div>
-                  <Label>Email</Label>
-                  <p className="font-medium">{selectedTeamMember.email}</p>
-                </div>
-                <div>
-                  <Label>Designation</Label>
-                  <p className="font-medium">{selectedTeamMember.designation}</p>
-                </div>
-                <div>
-                  <Label>Phone</Label>
-                  <p className="font-medium">{selectedTeamMember.phone_number}</p>
-                </div>
-                <div>
-                  <Label>State</Label>
-                  <p className="font-medium">{selectedTeamMember.state}</p>
-                </div>
-                <div>
-                  <Label>District</Label>
-                  <p className="font-medium">{selectedTeamMember.district}</p>
+                  <h3 className="text-lg font-semibold">Access Permissions</h3>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div>
+                      <Label>Can View Reports</Label>
+                      <p className="font-medium">{displayBool(selectedTeamMember.can_view_reports)}</p>
+                    </div>
+                    <div>
+                      <Label>Can Approve Reports</Label>
+                      <p className="font-medium">{displayBool(selectedTeamMember.can_approve_reports)}</p>
+                    </div>
+                    <div>
+                      <Label>Can Manage Teams</Label>
+                      <p className="font-medium">{displayBool(selectedTeamMember.can_manage_teams)}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
         </DialogContent>
       </Dialog>
 
@@ -1035,36 +1197,79 @@ const AuthorityDashboard = () => {
           <DialogHeader>
             <DialogTitle>Sub-Authority Details</DialogTitle>
           </DialogHeader>
-          {selectedSubAuthority && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Name</Label>
-                  <p className="font-medium">{selectedSubAuthority.name}</p>
-                </div>
-                <div>
-                  <Label>Level</Label>
-                  <p className="font-medium">{selectedSubAuthority.level}</p>
-                </div>
-                <div>
-                  <Label>Location</Label>
-                  <p className="font-medium">{selectedSubAuthority.location}</p>
-                </div>
-                <div>
-                  <Label>Reports Count</Label>
-                  <p className="font-medium">{selectedSubAuthority.reportsCount}</p>
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <Badge variant="default">{selectedSubAuthority.status}</Badge>
-                </div>
-                <div>
-                  <Label>Created Date</Label>
-                  <p className="font-medium">{selectedSubAuthority.createdDate}</p>
+            {selectedSubAuthority && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Name</Label>
+                    <p className="font-medium">{formatFullName(selectedSubAuthority)}</p>
+                  </div>
+                  <div>
+                    <Label>Role / Level</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.role ?? selectedSubAuthority.level)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Email</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.email)}</p>
+                  </div>
+                  <div>
+                    <Label>Phone</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.phone_number)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Designation</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.designation)}</p>
+                  </div>
+                  <div>
+                    <Label>Government Service ID</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.government_service_id)}</p>
+                  </div>
+
+                  <div>
+                    <Label>State</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.state ?? selectedSubAuthority.location?.state)}</p>
+                  </div>
+                  <div>
+                    <Label>District</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.district ?? selectedSubAuthority.location?.district)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Nagar Panchayat</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.nagar_panchayat ?? selectedSubAuthority.location?.nagar_panchayat)}</p>
+                  </div>
+                  <div>
+                    <Label>Village</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.village ?? selectedSubAuthority.location?.village)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Address</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.address)}</p>
+                  </div>
+                  <div>
+                    <Label>Location (full)</Label>
+                    <p className="font-medium">{formatLocation(selectedSubAuthority)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Created Date</Label>
+                    <p className="font-medium">{formatDate(selectedSubAuthority.created_date)}</p>
+                  </div>
+                  <div>
+                    <Label>Status</Label>
+                    <p className="font-medium">{displayText(selectedSubAuthority.status)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Reports Count</Label>
+                    <p className="font-medium">{selectedSubAuthority.reportsCount ?? "Not Provided"}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
         </DialogContent>
       </Dialog>
     </div>
