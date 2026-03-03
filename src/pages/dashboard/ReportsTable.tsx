@@ -40,8 +40,11 @@ import EditReportModal from "@/components/modals/EditReportModal";
 import { useOfficialLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiService } from "@/services/api";
+import { useNavigate } from "react-router-dom";
+import { map } from "leaflet"; // Assuming you have a map utility for handling map interactions
 
 const ReportsTable = () => {
+  const navigate = useNavigate();
   const { t } = useOfficialLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -80,28 +83,69 @@ const ReportsTable = () => {
     fetchReports();
   }, [user]);
 
-  const mapServerToRow = (r: any) => {
-    const reportedAt = r.reported_at || r.reportedAt || r.created_at || r.reportedAt;
-    const dateObj = reportedAt ? new Date(reportedAt) : null;
-    const date = dateObj ? dateObj.toISOString().slice(0,10) : (r.date || '');
-    const time = dateObj ? dateObj.toISOString().slice(11,16) : (r.time || '');
-    const location = r.location?.full_location || [r.location?.city, r.location?.district, r.location?.state].filter(Boolean).join(', ') || r.city || r.state || '';
-    const severity = r.emergency_level ? (r.emergency_level.charAt(0).toUpperCase() + r.emergency_level.slice(1)) : (r.severity || '');
+const mapServerToRow = (r: any) => {
+  const reportedAt = r.reported_at || r.created_at;
+  const dateObj = reportedAt ? new Date(reportedAt) : null;
+
+  const date = dateObj ? dateObj.toISOString().slice(0,10) : '';
+  const time = dateObj ? dateObj.toISOString().slice(11,16) : '';
+
+  const locationString =
+    r.location?.full_location ||
+    [r.location?.city, r.location?.district, r.location?.state]
+      .filter(Boolean)
+      .join(', ') ||
+    '';
+
+  const severity = r.emergency_level
+      ? r.emergency_level.charAt(0).toUpperCase() + r.emergency_level.slice(1)
+      : '';
+
     return {
-      id: r.report_id || r.id || r.reportId,
-      type: r.hazard_type_display || r.hazard_type || r.type || 'Unknown',
-      location,
-      reportedBy: (r.reported_by && (r.reported_by.name || `${r.reported_by.first_name || ''} ${r.reported_by.last_name || ''}`)) || r.reporter || 'Unknown',
-      source: r.source || r.reporterType || '',
+      id: r.report_id || r.id,
+      type: r.hazard_type_display || r.hazard_type || 'Unknown',
+      location: locationString,
+      latitude: r.location?.latitude,
+      longitude: r.location?.longitude,
+      reportedBy:
+        (r.reported_by && r.reported_by.name) || 'Unknown',
+      source: r.source || '',
       date,
       time,
-      status: (r.status || 'pending'),
+      status: r.status || 'pending',
       severity,
-      images: r.images_count || (r.images && r.images.length) || 0,
+      images: r.images_count || 0,
       description: r.description || '',
-      assignedTo: (r.reviewed_by && (r.reviewed_by.name || r.reviewed_by.email)) || r.assigned_to || '',
+      assignedTo:
+        (r.reviewed_by && r.reviewed_by.name) || '',
     };
   };
+
+  const handleViewOnMap = (report: any) => {
+    if (!report.latitude || !report.longitude) {
+      alert("Location coordinates not available for this report.");
+      return;
+    }
+
+    navigate('/dashboard', {
+      state: {
+        showLocation: {
+          lat: report.latitude,
+          lng: report.longitude,
+          title: report.type,
+          description: report.description,
+        }
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (location.state?.showLocation) {
+      const { lat, lng } = location.state.showLocation;
+      map.setView([lat, lng], 14);
+    }
+  }, [location.state]);
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -421,17 +465,9 @@ const ReportsTable = () => {
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEditReport(report)}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Report
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleViewOnMap(report)}>
                             <MapPin className="h-4 w-4 mr-2" />
                             View on Map
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete Report
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
