@@ -40,7 +40,12 @@ const hazardTypes = [
   { value: "waterPollution", label: "Water Pollution" },
   { value: "coastalFlooding", label: "Coastal Flooding" },
   { value: "cycloneWarning", label: "Cyclone Warning" },
+  { value: "water_disaster", label: "Water Disaster" },
+  { value: "oil_spill", label: "Oil Spill" },
+  { value: "coral_bleaching", label: "Coral Bleaching" },
+  { value: "normal", label: "Normal Condition" },
 ];
+
 
 const CreateReportModal = ({ isOpen, onClose, socialPost }: CreateReportModalProps) => {
   const { t } = useOfficialLanguage();

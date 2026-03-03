@@ -11,6 +11,7 @@ import { Camera, MapPin, Upload, Wifi, WifiOff, Clock, Eye, X, MapPinIcon, Shiel
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiService } from "@/services/api";
 import { saveOfflineReport } from "@/utils/offlineDB";
+import { Value } from "@radix-ui/react-select";
 
 const ReportHazard = () => {
   const { toast } = useToast();
@@ -53,8 +54,12 @@ const ReportHazard = () => {
   const [isVerifyingVideo, setIsVerifyingVideo] = useState(false);
   const [formVerified, setFormVerified] = useState(false);
 
+ 
   const hazardTypes = [
-    { value: "tsunami", label: "Tsunami Warning" },
+    { value: "water_disaster", label: "Water Disaster" },
+    { value: "oil_spill", label: "Oil Spill" },
+    { value: "coral_bleaching", label: "Coral Bleaching" },
+    { value: "normal", label: "Normal Condition" },
     { value: "storm-surge", label: "Storm Surge" },
     { value: "high-waves", label: "High Waves" },
     { value: "flooding", label: "Coastal Flooding" },

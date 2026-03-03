@@ -74,8 +74,13 @@ interface HazardReport {
 // Mock data for fallback (will be replaced by real data)
 const mockReports: HazardReport[] = [];
 
+
 const hazardTypes = [
   { value: "all", label: "All Hazards" },
+  { value: "water_disaster", label: "Water Disaster" },
+  { value: "oil_spill", label: "Oil Spill" },
+  { value: "coral_bleaching", label: "Coral Bleaching" },
+  { value: "normal", label: "Normal Condition" },
   { value: "tsunami", label: "Tsunami Warning" },
   { value: "storm-surge", label: "Storm Surge" },
   { value: "high-waves", label: "High Waves" },

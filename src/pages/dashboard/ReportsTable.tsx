@@ -297,6 +297,10 @@ const ReportsTable = () => {
                 <SelectItem value="waves">High Waves</SelectItem>
                 <SelectItem value="debris">Marine Debris</SelectItem>
                 <SelectItem value="storm">Storm Surge</SelectItem>
+                <SelectItem value="water_disaster">Water Disaster</SelectItem>
+                <SelectItem value="oil_spill">Oil Spill</SelectItem>
+                <SelectItem value="coral_bleaching">Coral Bleaching</SelectItem>
+                <SelectItem value="normal">Normal Condition</SelectItem>
                 <SelectItem value="pollution">Water Pollution</SelectItem>
                 <SelectItem value="flooding">Coastal Flooding</SelectItem>
               </SelectContent>
