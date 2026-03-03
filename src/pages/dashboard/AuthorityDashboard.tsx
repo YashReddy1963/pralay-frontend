@@ -135,6 +135,20 @@ const AuthorityDashboard = () => {
   });
 
   // State for API data
+  const [teamDocumentFile, setTeamDocumentFile] = useState<File | null>(null);
+  const [editDocumentFile, setEditDocumentFile] = useState<File | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingMemberId, setEditingMemberId] = useState<number | null>(null);
+  const [isEditingSubmitting, setIsEditingSubmitting] = useState(false);
+  const [editForm, setEditForm] = useState({
+    designation: '',
+    phone_number: '',
+    address: '',
+    government_service_id: '',
+    can_view_reports: false,
+    can_approve_reports: false,
+    can_manage_teams: false
+  });
   const [teamMembersData, setTeamMembersData] = useState<any[]>([]);
   const [subAuthorityTeamMembersData, setSubAuthorityTeamMembersData] = useState<any[]>([]);
   const [subAuthoritiesData, setSubAuthoritiesData] = useState<any[]>([]);
@@ -161,6 +175,7 @@ const AuthorityDashboard = () => {
     village?: string | null;
     address?: string | null;
     government_service_id?: string | null;
+  document_proof?: string | null;
     can_view_reports?: boolean | null;
     can_approve_reports?: boolean | null;
     can_manage_teams?: boolean | null;
@@ -219,18 +234,8 @@ const AuthorityDashboard = () => {
       if (isStateChairman) {
         const response = await apiService.getAuthorityTeamMembers();
         if (response.success) {
-          setTeamMembersData(
-            response.team_members.map((m: any) => {
-              const nameParts = m.name?.split(" ") || [];
-              return {
-                ...m,
-                first_name: nameParts[0] || "",
-                last_name: nameParts.slice(1).join(" ") || "",
-                assigned_date: m.created_date,
-                is_active: true,
-              };
-            })
-          );
+          // Store API response directly; do not mutate fields
+          setTeamMembersData(response.team_members || []);
         }
       } else if (isDistrictChairman) {
         const response = await apiService.getSubAuthorityTeamMembers();
@@ -289,15 +294,26 @@ const AuthorityDashboard = () => {
       setIsSubmittingTeam(true);
       
       const formData = new FormData();
-      formData.append('first_name', teamMemberForm.first_name);
-      formData.append('last_name', teamMemberForm.last_name);
+  formData.append('first_name', teamMemberForm.first_name);
+  formData.append('middle_name', teamMemberForm.middle_name);
+  formData.append('last_name', teamMemberForm.last_name);
       formData.append('email', teamMemberForm.email);
       formData.append('phone_number', teamMemberForm.phone_number);
       formData.append('designation', teamMemberForm.designation);
+  formData.append('nagar_panchayat', teamMemberForm.nagar_panchayat);
+  formData.append('village', teamMemberForm.village);
+  formData.append('address', teamMemberForm.address);
+  formData.append('government_service_id', teamMemberForm.government_service_id);
+  formData.append('can_view_reports', String(teamMemberForm.can_view_reports));
+  formData.append('can_approve_reports', String(teamMemberForm.can_approve_reports));
+  formData.append('can_manage_teams', String(teamMemberForm.can_manage_teams));
       formData.append('state', teamMemberForm.state);
       formData.append('district', teamMemberForm.district);
       formData.append('password1', teamMemberForm.password1);
       formData.append('password2', teamMemberForm.password2);
+      if (teamDocumentFile) {
+        formData.append('document_proof', teamDocumentFile);
+      }
       
       // Choose API endpoint depending on role
       let response: any = { success: false };
@@ -437,6 +453,69 @@ const AuthorityDashboard = () => {
     setIsTeamMemberDetailOpen(true);
   };
 
+  // Handle clicking edit on a team member
+  const handleEditClick = (member: any) => {
+    setEditingMemberId(member.id ?? null);
+    setEditForm({
+      designation: member.designation ?? '',
+      phone_number: member.phone_number ?? '',
+      address: member.address ?? '',
+      government_service_id: member.government_service_id ?? '',
+      can_view_reports: !!member.can_view_reports,
+      can_approve_reports: !!member.can_approve_reports,
+      can_manage_teams: !!member.can_manage_teams
+    });
+    setEditDocumentFile(null);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editingMemberId) return;
+    try {
+      setIsEditingSubmitting(true);
+      let response: any = { success: false };
+
+      if (editDocumentFile) {
+        const formData = new FormData();
+        formData.append('designation', editForm.designation);
+        formData.append('phone_number', editForm.phone_number);
+        formData.append('address', editForm.address);
+        formData.append('government_service_id', editForm.government_service_id);
+        formData.append('can_view_reports', String(editForm.can_view_reports));
+        formData.append('can_approve_reports', String(editForm.can_approve_reports));
+        formData.append('can_manage_teams', String(editForm.can_manage_teams));
+        formData.append('document_proof', editDocumentFile);
+
+        response = await apiService.updateTeamMember(editingMemberId, formData);
+      } else {
+        const body = {
+          designation: editForm.designation,
+          phone_number: editForm.phone_number,
+          address: editForm.address,
+          government_service_id: editForm.government_service_id,
+          can_view_reports: editForm.can_view_reports,
+          can_approve_reports: editForm.can_approve_reports,
+          can_manage_teams: editForm.can_manage_teams
+        };
+        response = await apiService.updateTeamMember(editingMemberId, body);
+      }
+
+      if (response && response.success) {
+        toast.success('Team member updated');
+        setIsEditModalOpen(false);
+        setEditingMemberId(null);
+        fetchTeamMembers();
+      } else {
+        toast.error(response?.error || 'Failed to update team member');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update team member');
+      console.error('Update team member error:', error);
+    } finally {
+      setIsEditingSubmitting(false);
+    }
+  };
+
   // Handle viewing sub-authority details
   const handleViewSubAuthorityDetails = (authority: any) => {
     setSelectedSubAuthority(authority);
@@ -466,11 +545,14 @@ const AuthorityDashboard = () => {
 
   const formatFullName = (obj: any) => {
     if (!obj) return "Not Provided";
-    const parts = [obj.first_name, obj.middle_name, obj.last_name].filter((p) => p && String(p).trim() !== "");
-    if (parts.length) return parts.join(" ");
-    // Fallback to a single 'name' field if present
-    if (obj.name && String(obj.name).trim() !== "") return String(obj.name);
-    return "Not Provided";
+    
+    const parts = [
+      obj.first_name,
+      obj.middle_name,
+      obj.last_name
+    ].filter(p => p && String(p).trim() !== "");
+  
+    return parts.length ? parts.join(" ") : "Not Provided";
   };
 
   const formatLocation = (obj: any) => {
@@ -602,7 +684,7 @@ const AuthorityDashboard = () => {
                       </Avatar>
                       <div className="flex-1">
                         <p className="font-medium">
-                          {member.first_name} {member.last_name}
+                          {formatFullName(member)}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {member.designation}
@@ -692,6 +774,15 @@ const AuthorityDashboard = () => {
                             />
                           </div>
                           <div>
+                            <Label>Middle Name</Label>
+                            <Input
+                              value={teamMemberForm.middle_name}
+                              onChange={(e) =>
+                                setTeamMemberForm(prev => ({...prev, middle_name: e.target.value}))
+                              }
+                            />
+                          </div>
+                          <div>
                             <Label htmlFor="last_name">Last Name *</Label>
                             <Input
                               id="last_name"
@@ -729,6 +820,14 @@ const AuthorityDashboard = () => {
                             onChange={(e) => setTeamMemberForm(prev => ({...prev, designation: e.target.value}))}
                           />
                         </div>
+                        <Input
+                          type="file"
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              setTeamDocumentFile(e.target.files[0]);
+                            }
+                          }}
+                        />
                       </div>
                     </TabsContent>
 
@@ -880,7 +979,7 @@ const AuthorityDashboard = () => {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{member.first_name} {member.last_name}</p>
+                          <p className="font-medium">{formatFullName(member)}</p>
                           <p className="text-sm text-muted-foreground">{member.email}</p>
                           <p className="text-xs text-muted-foreground">
                             {member.designation} • Assigned: {new Date(member.assigned_date).toLocaleDateString()}
@@ -893,6 +992,9 @@ const AuthorityDashboard = () => {
                         </Badge>
                         <Button variant="ghost" size="icon" title="View Details" onClick={() => handleViewTeamMemberDetails(member)}>
                           <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" title="Edit Member" onClick={() => handleEditClick(member)}>
+                          <Edit className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" title="Remove Member" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => 
                           isStateChairman ? handleRemoveTeamMember(member.id) : handleRemoveSubAuthorityTeamMember(member.id)
@@ -1106,6 +1208,65 @@ const AuthorityDashboard = () => {
       </Tabs>
 
       {/* Team Member Detail Modal */}
+      {/* Team Member Edit Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Team Member</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Designation</Label>
+                <Input value={editForm.designation} onChange={(e) => setEditForm(prev => ({...prev, designation: e.target.value}))} />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <Input value={editForm.phone_number} onChange={(e) => setEditForm(prev => ({...prev, phone_number: e.target.value}))} />
+              </div>
+            </div>
+
+            <div>
+              <Label>Address</Label>
+              <Input value={editForm.address} onChange={(e) => setEditForm(prev => ({...prev, address: e.target.value}))} />
+            </div>
+
+            <div>
+              <Label>Government Service ID</Label>
+              <Input value={editForm.government_service_id} onChange={(e) => setEditForm(prev => ({...prev, government_service_id: e.target.value}))} />
+            </div>
+
+            <div>
+              <Label>Document Proof (optional)</Label>
+              <input type="file" onChange={(e: any) => setEditDocumentFile(e.target.files?.[0] || null)} />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">Access Permissions</h3>
+              <div className="grid grid-cols-2 gap-4 mt-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox checked={editForm.can_view_reports} onCheckedChange={(v) => setEditForm(prev => ({...prev, can_view_reports: v as boolean}))} />
+                  <Label>Can View Reports</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox checked={editForm.can_approve_reports} onCheckedChange={(v) => setEditForm(prev => ({...prev, can_approve_reports: v as boolean}))} />
+                  <Label>Can Approve Reports</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox checked={editForm.can_manage_teams} onCheckedChange={(v) => setEditForm(prev => ({...prev, can_manage_teams: v as boolean}))} />
+                  <Label>Can Manage Teams</Label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end space-x-4 pt-4 border-t">
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={isEditingSubmitting}>Cancel</Button>
+            <Button className="bg-purple-600 hover:bg-purple-700" onClick={handleEditSubmit} disabled={isEditingSubmitting}>
+              {isEditingSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Dialog open={isTeamMemberDetailOpen} onOpenChange={setIsTeamMemberDetailOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -1157,6 +1318,15 @@ const AuthorityDashboard = () => {
                   <div>
                     <Label>Government Service ID</Label>
                     <p className="font-medium">{displayText(selectedTeamMember.government_service_id)}</p>
+                  </div>
+
+                  <div>
+                    <Label>Document Proof</Label>
+                    {selectedTeamMember.document_proof ? (
+                      <a className="text-primary underline" href={selectedTeamMember.document_proof} target="_blank" rel="noreferrer">View Document</a>
+                    ) : (
+                      <p className="font-medium">Not Provided</p>
+                    )}
                   </div>
 
                   <div>

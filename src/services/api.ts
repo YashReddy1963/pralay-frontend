@@ -386,6 +386,16 @@ class ApiService {
     });
   }
 
+  async updateTeamMember(memberId: number, body: FormData | Record<string, any>): Promise<any> {
+    const endpoint = `/api/authority/team-members/${memberId}/update/`;
+    const isForm = body instanceof FormData;
+    return this.request(endpoint, {
+      method: 'POST', // backend accepts POST as fallback for PUT to support multipart
+      body: isForm ? body as FormData : JSON.stringify(body),
+      headers: isForm ? {} : { 'Content-Type': 'application/json' }
+    });
+  }
+
   async createSubAuthority(formData: FormData): Promise<any> {
     // Create a sub-authority (state-level creates subordinate authorities)
     return this.request('/api/create-sub-authority/', {
@@ -485,6 +495,13 @@ class ApiService {
   // User-specific reports API methods
   async getUserReports(): Promise<any> {
     return this.request('/api/hazard-reports/?user_reports=true', {
+      method: 'GET',
+    });
+  }
+
+  //get newer team members
+  async getTeamMembersNew(): Promise<any> {
+    return this.request('/api/team-members-new/', {
       method: 'GET',
     });
   }
