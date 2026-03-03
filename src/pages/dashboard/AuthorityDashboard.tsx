@@ -995,7 +995,7 @@ const AuthorityDashboard = () => {
                           <p className="font-medium">{formatFullName(member)}</p>
                           <p className="text-sm text-muted-foreground">{member.email}</p>
                           <p className="text-xs text-muted-foreground">
-                            {member.designation} • Assigned: {new Date(member.assigned_date).toLocaleDateString()}
+                            {member.designation} • Assigned: {member.assigned_date ? new Date(member.assigned_date).toLocaleDateString() : "Not Provided"}
                           </p>
                         </div>
                       </div>
