@@ -41,7 +41,10 @@ const AuthorityDashboard = () => {
 
   // Role helpers
   const isStateChairman = user?.role === 'state_chairman';
-  const isDistrictChairman = user?.role === 'district_chairman';
+  const isDistrictChairman =
+  user?.role === 'district_chairman' ||
+  user?.role === 'nagar_panchayat_chairman' ||
+  user?.role === 'village_sarpanch';
 
   // Role-based access control
   const canManageAuthorities = isStateChairman;

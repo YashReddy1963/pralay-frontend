@@ -38,7 +38,14 @@ const DashboardLayout = () => {
       { path: "/dashboard/settings", icon: Settings, label: t("nav.settings"), exact: false },
     ];
 
-    return baseItems;
+    const filteredItems = baseItems.filter(item => {
+      if (item.path === "/dashboard/authority") {
+        return user?.role === 'state_chairman' || user?.role === 'district_chairman';
+      }
+      return true;
+    });
+    
+    return filteredItems;
   };
   
   const navigationItems = getNavigationItems();
