@@ -2469,8 +2469,9 @@ const ReportHazard = () => {
                       Take Photo
                     </Button>
                   </div>
-                  
-                  <div className="flex space-x-2">
+                 
+                 {/*
+                <div className="flex space-x-2">
                     <Button
                       type="button"
                       variant="outline"
@@ -2490,6 +2491,9 @@ const ReportHazard = () => {
                       Record Video
                     </Button>
                   </div>
+                 */}
+                  
+                  
                 </div>
                 
                 <input
