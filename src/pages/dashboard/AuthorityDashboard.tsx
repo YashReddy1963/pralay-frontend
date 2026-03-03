@@ -486,7 +486,13 @@ const AuthorityDashboard = () => {
         formData.append('can_manage_teams', String(editForm.can_manage_teams));
         formData.append('document_proof', editDocumentFile);
 
-        response = await apiService.updateTeamMember(editingMemberId, formData);
+        if (isStateChairman) {
+          response = await apiService.updateTeamMember(editingMemberId, formData);
+        } else if (isDistrictChairman) {
+          response = await apiService.updateSubAuthorityTeamMember(editingMemberId, formData);
+        } else {
+          response = { success: false, error: 'Unauthorized role' };
+        }
       } else {
         const body = {
           designation: editForm.designation,
@@ -497,7 +503,13 @@ const AuthorityDashboard = () => {
           can_approve_reports: editForm.can_approve_reports,
           can_manage_teams: editForm.can_manage_teams
         };
-        response = await apiService.updateTeamMember(editingMemberId, body);
+        if (isStateChairman) {
+          response = await apiService.updateTeamMember(editingMemberId, body);
+        } else if (isDistrictChairman) {
+          response = await apiService.updateSubAuthorityTeamMember(editingMemberId, body);
+        } else {
+          response = { success: false, error: 'Unauthorized role' };
+        }
       }
 
       if (response && response.success) {
@@ -696,41 +708,42 @@ const AuthorityDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Shield className="h-5 w-5" />
-                  <span>Authority Status</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {subAuthoritiesData.map((authority) => (
-                    <div key={authority.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarFallback>
-                            {authority.first_name?.[0]}
-                            {authority.last_name?.[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">
-                            {authority.first_name} {authority.last_name}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {authority.role}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {authority.state}, {authority.district}
-                          </p>
+            {isStateChairman && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Shield className="h-5 w-5" />
+                    <span>Authority Status</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {subAuthoritiesData.map((authority) => (
+                      <div key={authority.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <Avatar>
+                            <AvatarFallback>
+                              {String(formatFullName(authority)).split(' ').map((n: string) => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">
+                              {formatFullName(authority)}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {displayText(authority.role ?? authority.level)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatLocation(authority)}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
 

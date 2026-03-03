@@ -396,6 +396,16 @@ class ApiService {
     });
   }
 
+  async updateSubAuthorityTeamMember(memberId: number, body: FormData | Record<string, any>): Promise<any> {
+    const endpoint = `/api/sub-authority/team-members/${memberId}/update/`;
+    const isForm = body instanceof FormData;
+    return this.request(endpoint, {
+      method: 'POST',
+      body: isForm ? body as FormData : JSON.stringify(body),
+      headers: isForm ? {} : { 'Content-Type': 'application/json' }
+    });
+  }
+
   async createSubAuthority(formData: FormData): Promise<any> {
     // Create a sub-authority (state-level creates subordinate authorities)
     return this.request('/api/create-sub-authority/', {
