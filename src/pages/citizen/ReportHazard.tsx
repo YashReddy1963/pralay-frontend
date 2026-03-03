@@ -122,7 +122,13 @@ const ReportHazard = () => {
           
           // Better parsing for Indian addresses
           let city = address.city || address.town || address.village || address.hamlet || address.suburb || address.municipality || 'Unknown City';
-          let district = address.county || address.state_district || address.region || 'Unknown District';
+          let rawDistrict = address.county || address.state_district || address.region || 'Unknown District';
+
+// Remove common suffixes like "District", "district"
+let district = rawDistrict
+  .replace(/\s+district$/i, '')
+  .replace(/\s+district\s*$/i, '')
+  .trim();
           let state = address.state || address.province || 'Unknown State';
           let country = address.country || 'Unknown Country';
           
@@ -199,7 +205,13 @@ const ReportHazard = () => {
         if (data && data.address) {
           const address = data.address;
           let city = address.city || address.town || address.village || address.hamlet || address.suburb || 'Unknown City';
-          let district = address.county || address.state_district || address.region || 'Unknown District';
+          let rawDistrict = address.county || address.state_district || address.region || 'Unknown District';
+
+          // Remove common suffixes like "District", "district"
+          let district = rawDistrict
+            .replace(/\s+district$/i, '')
+            .replace(/\s+district\s*$/i, '')
+            .trim();
           let state = address.state || address.province || 'Unknown State';
           let country = address.country || 'Unknown Country';
           
