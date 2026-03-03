@@ -845,10 +845,17 @@ const ReportHazard = () => {
       verificationData.append('description', formData.description || '');
       
       // Call AI verification service (using Django backend)
-      const response = await fetch('https://pralay-backend-1.onrender.com/api/verify-image/', {
-        method: 'POST',
-        body: verificationData,
-      });
+      const token = localStorage.getItem("authToken");
+      const response = await fetch(
+        'https://pralay-backend-1.onrender.com/api/verify-image/',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: verificationData,
+        }
+      );
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
