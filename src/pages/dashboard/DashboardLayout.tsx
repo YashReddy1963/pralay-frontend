@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useOfficialLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { useAuth } from "../../contexts/AuthContext";
+import path from "path";
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -33,14 +34,10 @@ const DashboardLayout = () => {
       { path: "/dashboard/reports", icon: FileText, label: t("nav.reports"), exact: false },
       { path: "/dashboard/analytics", icon: BarChart3, label: t("nav.analytics"), exact: false },
       { path: "/dashboard/social", icon: MessageCircle, label: t("nav.socialFeed"), exact: false },
+      { path: "/dashboard/authority", icon: Users, label: t("Authority Dashboard"), exact: false },
       { path: "/dashboard/settings", icon: Settings, label: t("nav.settings"), exact: false },
     ];
-    
-    // Only show Authority Dashboard for state chairman and above
-    if (user?.role === 'state_chairman') {
-      baseItems.splice(4, 0, { path: "/dashboard/authority", icon: Users, label: "Authority Dashboard", exact: false });
-    }
-    
+
     return baseItems;
   };
   

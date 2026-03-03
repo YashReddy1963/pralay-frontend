@@ -43,7 +43,7 @@ interface AuthorityRouteProps {
 
 export const AuthorityRoute: React.FC<AuthorityRouteProps> = ({ children }) => {
   return (
-    <ProtectedRoute allowedRoles={['state_chairman']}>
+    <ProtectedRoute allowedRoles={['state_chairman', 'district_chairman', 'nagar_panchayat_chairman', 'village_sarpanch']}>
       {children}
     </ProtectedRoute>
   );

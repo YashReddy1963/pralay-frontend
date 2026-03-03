@@ -39,30 +39,26 @@ const AuthorityDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Redirect district chairmen and other sub-authorities away from this page
-  useEffect(() => {
-    if (user && user.role !== 'state_chairman') {
-      // Redirect to main dashboard for district chairmen and other roles
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
+  // Role helpers
+  const isStateChairman = user?.role === 'state_chairman';
+  const isDistrictChairman = user?.role === 'district_chairman';
 
-  // Don't render anything if user is not state chairman
-  if (!user || user.role !== 'state_chairman') {
+  // Role-based access control
+  const canManageAuthorities = isStateChairman;
+  const canManageTeam = isStateChairman || isDistrictChairman; // state or district can manage team
+  const isTeamMember = false; // Team members can't access this page
+
+  // Allow only state or district chairman to view this page
+  if (!user || (user.role !== 'state_chairman' && user.role !== 'district_chairman')) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Access Restricted</h2>
-          <p className="text-muted-foreground">This page is only available for State Chairman.</p>
+          <p className="text-muted-foreground">This page is only available for State or District Chairman.</p>
         </div>
       </div>
     );
   }
-
-  // Role-based access control
-  const canManageAuthorities = user?.role === 'state_chairman';
-  const canManageTeam = user?.role === 'state_chairman'; // Only state chairman can access this page
-  const isTeamMember = false; // Team members can't access this page
 
   // Mock data for team members
   const teamMembers = [
@@ -95,27 +91,7 @@ const AuthorityDashboard = () => {
     }
   ];
 
-  // Mock data for subordinate authorities
-  const subordinateAuthorities = [
-    {
-      id: 1,
-      name: "District Emergency Manager",
-      level: "District",
-      location: "Chennai District",
-      reportsCount: 45,
-      status: "Active",
-      createdDate: "2024-01-15"
-    },
-    {
-      id: 2,
-      name: "Local Area Coordinator",
-      level: "Local",
-      location: "Marina Beach Zone",
-      reportsCount: 23,
-      status: "Active",
-      createdDate: "2024-02-01"
-    }
-  ];
+  // Note: subordinate authorities are fetched from backend for state chairmen and stored in `subAuthoritiesData`.
 
   const [teamMemberForm, setTeamMemberForm] = useState({
     first_name: "",
@@ -161,6 +137,7 @@ const AuthorityDashboard = () => {
   // State for API data
   const [teamMembersData, setTeamMembersData] = useState<any[]>([]);
   const [subAuthorityTeamMembersData, setSubAuthorityTeamMembersData] = useState<any[]>([]);
+  const [subAuthoritiesData, setSubAuthoritiesData] = useState<any[]>([]);
   const [isLoadingTeamMembers, setIsLoadingTeamMembers] = useState(false);
   const [isLoadingSubAuthorityTeamMembers, setIsLoadingSubAuthorityTeamMembers] = useState(false);
   const [isSubmittingTeam, setIsSubmittingTeam] = useState(false);
@@ -178,19 +155,38 @@ const AuthorityDashboard = () => {
   const metrics = {
     activeReports: 24,
     resolved: 156,
-    teamMembers: teamMembersData.length, // Only state chairman can access this page
+    teamMembers: teamMembersData.length,
     responseTime: "2.3h"
   };
 
-  // Fetch team members data
+  // Fetch team members data. For state chairman use authority endpoint, for district use sub-authority endpoint.
   const fetchTeamMembers = async () => {
     if (!canManageTeam) return;
-    
+
     try {
       setIsLoadingTeamMembers(true);
-      const response = await apiService.getAuthorityTeamMembers();
-      if (response.success) {
-        setTeamMembersData(response.team_members);
+      if (isStateChairman) {
+        const response = await apiService.getAuthorityTeamMembers();
+        if (response.success) {
+          setTeamMembersData(
+            response.team_members.map((m: any) => {
+              const nameParts = m.name?.split(" ") || [];
+              return {
+                ...m,
+                first_name: nameParts[0] || "",
+                last_name: nameParts.slice(1).join(" ") || "",
+                assigned_date: m.created_date,
+                is_active: true,
+              };
+            })
+          );
+        }
+      } else if (isDistrictChairman) {
+        const response = await apiService.getSubAuthorityTeamMembers();
+        if (response.success) {
+          // Store sub-authority team members in the same UI list for district chairmen
+          setTeamMembersData(response.team_members);
+        }
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to fetch team members");
@@ -200,10 +196,34 @@ const AuthorityDashboard = () => {
     }
   };
 
-  // Fetch sub-authority team members data (not needed since only state chairman can access)
+  // Fetch sub-authority team members (kept for compatibility but not called on mount)
   const fetchSubAuthorityTeamMembers = async () => {
-    // This function is no longer needed since only state chairman can access this page
-    return;
+    try {
+      setIsLoadingSubAuthorityTeamMembers(true);
+      const response = await apiService.getSubAuthorityTeamMembers();
+      if (response.success) {
+        setSubAuthorityTeamMembersData(response.team_members);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to fetch sub-authority team members");
+      console.error("Fetch sub-authority team members error:", error);
+    } finally {
+      setIsLoadingSubAuthorityTeamMembers(false);
+    }
+  };
+
+  // Fetch subordinate authorities (state-chairman only)
+  const fetchSubAuthorities = async () => {
+    if (!isStateChairman) return;
+    try {
+      const resp = await apiService.getSubAuthorities();
+      if (resp.success) {
+        setSubAuthoritiesData(resp.sub_authorities || []);
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch subordinate authorities', error);
+      toast.error(error.message || 'Failed to fetch subordinate authorities');
+    }
   };
 
   // Handle team member creation
@@ -222,8 +242,15 @@ const AuthorityDashboard = () => {
       formData.append('password1', teamMemberForm.password1);
       formData.append('password2', teamMemberForm.password2);
       
-      // Use the available API method for creating sub-authority team members
-      const response = await apiService.createSubAuthorityTeamMember(formData);
+      // Choose API endpoint depending on role
+      let response: any = { success: false };
+      if (isStateChairman) {
+        // State chairman creates top-level team members
+        response = await apiService.createTeamMember(formData);
+      } else if (isDistrictChairman) {
+        // District chairman creates sub-authority team members under themselves
+        response = await apiService.createSubAuthorityTeamMember(formData);
+      }
       if (response.success) {
         toast.success(response.message);
         setIsTeamModalOpen(false);
@@ -258,8 +285,64 @@ const AuthorityDashboard = () => {
 
   // Handle authority creation
   const handleAuthoritySubmit = async () => {
-    toast.error("Authority creation feature is not yet implemented in the API");
-    setIsAuthorityModalOpen(false);
+    if (!isStateChairman) {
+      toast.error('Only state chairman can create sub-authorities');
+      return;
+    }
+
+    try {
+      setIsSubmittingAuthority(true);
+      const formData = new FormData();
+      formData.append('first_name', authorityForm.first_name);
+      formData.append('last_name', authorityForm.last_name);
+      formData.append('email', authorityForm.email);
+      formData.append('phone_number', authorityForm.phone_number);
+      formData.append('designation', authorityForm.designation);
+      formData.append('role', authorityForm.role);
+      formData.append('state', authorityForm.state);
+      formData.append('district', authorityForm.district);
+      formData.append('nagar_panchayat', authorityForm.nagar_panchayat);
+      formData.append('village', authorityForm.village);
+      formData.append('address', authorityForm.address);
+      formData.append('government_service_id', authorityForm.government_service_id);
+      formData.append('password1', authorityForm.password1);
+      formData.append('password2', authorityForm.password2);
+
+      const resp = await apiService.createSubAuthority(formData);
+      if (resp.success) {
+        toast.success(resp.message || 'Sub-authority created');
+        setIsAuthorityModalOpen(false);
+        setAuthorityForm({
+          first_name: "",
+          middle_name: "",
+          last_name: "",
+          email: "",
+          phone_number: "",
+          designation: "",
+          role: "",
+          state: "",
+          district: "",
+          nagar_panchayat: "",
+          village: "",
+          address: "",
+          government_service_id: "",
+          can_view_reports: false,
+          can_approve_reports: false,
+          can_manage_teams: false,
+          password1: "",
+          password2: ""
+        });
+        // Refresh subordinate list
+        fetchSubAuthorities();
+      } else {
+        toast.error(resp?.message || 'Failed to create sub-authority');
+      }
+    } catch (error: any) {
+      console.error('Create sub-authority error', error);
+      toast.error(error.message || 'Failed to create sub-authority');
+    } finally {
+      setIsSubmittingAuthority(false);
+    }
   };
 
   // Handle team member removal
@@ -282,7 +365,8 @@ const AuthorityDashboard = () => {
       const response = await apiService.removeSubAuthorityTeamMember(memberId);
       if (response.success) {
         toast.success(response.message);
-        fetchSubAuthorityTeamMembers(); // Refresh the list
+        // Refresh the unified team list so UI stays consistent for district chairmen
+        fetchTeamMembers();
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to remove sub-authority team member");
@@ -305,7 +389,9 @@ const AuthorityDashboard = () => {
   // Load data on component mount
   useEffect(() => {
     fetchTeamMembers();
-    fetchSubAuthorityTeamMembers();
+    if (isStateChairman) {
+      fetchSubAuthorities();
+    }
   }, [user?.role]);
 
   return (
@@ -318,7 +404,7 @@ const AuthorityDashboard = () => {
         </div>
         <div className="flex items-center space-x-4">
           <Badge variant="outline" className="text-green-600 border-green-600">
-            State Chairman
+            {isStateChairman ? "State Chairman" : "District Chairman"}
           </Badge>
         </div>
       </div>
@@ -387,7 +473,9 @@ const AuthorityDashboard = () => {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="team">Team Management</TabsTrigger>
-          <TabsTrigger value="authorities">Subordinate Authorities</TabsTrigger>
+          {isStateChairman && (
+            <TabsTrigger value="authorities">Subordinate Authorities</TabsTrigger>
+          )}
         </TabsList>
 
         {/* Overview Tab */}
@@ -431,7 +519,7 @@ const AuthorityDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {subordinateAuthorities.map((authority) => (
+                  {(subAuthoritiesData.length ? subAuthoritiesData : []).map((authority) => (
                     <div key={authority.id} className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">{authority.name}</p>
@@ -691,7 +779,9 @@ const AuthorityDashboard = () => {
                         <Button variant="ghost" size="icon" title="View Details" onClick={() => handleViewTeamMemberDetails(member)}>
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" title="Remove Member" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleRemoveTeamMember(member.id)}>
+                        <Button variant="ghost" size="icon" title="Remove Member" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => 
+                          isStateChairman ? handleRemoveTeamMember(member.id) : handleRemoveSubAuthorityTeamMember(member.id)
+                        }>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -710,7 +800,8 @@ const AuthorityDashboard = () => {
         </TabsContent>
 
         {/* Subordinate Authorities Tab */}
-        <TabsContent value="authorities" className="space-y-6">
+        {isStateChairman && (
+          <TabsContent value="authorities" className="space-y-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center space-x-2">
@@ -867,7 +958,7 @@ const AuthorityDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {subordinateAuthorities.map((authority) => (
+                {(subAuthoritiesData.length ? subAuthoritiesData : []).map((authority) => (
                   <div key={authority.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-3">
                       <Avatar>
@@ -896,6 +987,7 @@ const AuthorityDashboard = () => {
             </CardContent>
           </Card>
         </TabsContent>
+        )}
       </Tabs>
 
       {/* Team Member Detail Modal */}

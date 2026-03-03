@@ -378,6 +378,29 @@ class ApiService {
     });
   }
 
+  async createTeamMember(formData: FormData): Promise<any> {
+    // Create a top-level team member (state-level)
+    return this.request('/api/create-team-member/', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  async createSubAuthority(formData: FormData): Promise<any> {
+    // Create a sub-authority (state-level creates subordinate authorities)
+    return this.request('/api/create-sub-authority/', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  async getSubAuthorities(): Promise<any> {
+    // Get subordinate authorities created by the authenticated authority
+    return this.request('/api/sub-authorities/', {
+      method: 'GET',
+    });
+  }
+
   async removeSubAuthorityTeamMember(memberId: number): Promise<any> {
     return this.request(`/api/sub-authority/team-members/${memberId}/remove/`, {
       method: 'DELETE',
