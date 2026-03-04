@@ -74,13 +74,8 @@ interface HazardReport {
 // Mock data for fallback (will be replaced by real data)
 const mockReports: HazardReport[] = [];
 
-
 const hazardTypes = [
   { value: "all", label: "All Hazards" },
-  { value: "water_disaster", label: "Water Disaster" },
-  { value: "oil_spill", label: "Oil Spill" },
-  { value: "coral_bleaching", label: "Coral Bleaching" },
-  { value: "normal", label: "Normal Condition" },
   { value: "tsunami", label: "Tsunami Warning" },
   { value: "storm-surge", label: "Storm Surge" },
   { value: "high-waves", label: "High Waves" },
@@ -133,26 +128,9 @@ const HazardMap = () => {
       };
 
       const response = await apiService.getMapHazardReports(filters);
-
+      
       if (response.success) {
-        const normalized = (response.reports || []).map((r: any) => {
-          const imgs = r.images || [];
-          const normalizedImages = imgs.map((img: any) => ({
-            ...img,
-            // Backend may return image.url or image.image_url or other shapes; prefer url but fall back
-            url: img.url || img.image_url || img.image || (img.image_file && (img.image_file.url || img.image_file)) || null,
-          }));
-
-          const images_count = r.images_count || normalizedImages.length || 0;
-          return {
-            ...r,
-            images: normalizedImages,
-            images_count,
-            has_images: images_count > 0,
-          };
-        });
-
-        setReports(normalized);
+        setReports(response.reports || []);
         
         // Show district filtering info for district chairmen
         if (user?.role === 'district_chairman' && response.filters_applied?.district_filtered) {
@@ -277,7 +255,7 @@ const HazardMap = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Reports Discarded</p>
+                <p className="text-sm font-medium text-muted-foreground">{t("official.hazardMap.discarded")}</p>
                 <p className="text-2xl font-bold text-red-600">
                   {loading ? "..." : reports.filter(r => r.status === "discarded").length}
                 </p>

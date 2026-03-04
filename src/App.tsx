@@ -31,6 +31,7 @@ import HazardMap from "./pages/dashboard/HazardMap";
 import ReportsPage from "./pages/dashboard/ReportsPage";
 import Analytics from "./pages/dashboard/Analytics";
 import SocialFeed from "./pages/dashboard/SocialFeed";
+import NewsFeed from "./pages/dashboard/NewsFeed";
 import AuthorityDashboard from "./pages/dashboard/AuthorityDashboard";
 import OfficialSettings from "./pages/dashboard/Settings";
 import AuthorityProfile from "./pages/dashboard/AuthorityProfile";
@@ -75,7 +76,7 @@ const App = () => (
               <Route path="settings" element={<CitizenSettings />} />
             </Route>
             
-            {/* Official Dashboard Routes */}
+            {/* Official Dashboard   Routes */}
             <Route path="/dashboard" element={
               <DashboardRoute>
                 <OfficialLanguageProvider>
@@ -87,6 +88,7 @@ const App = () => (
               <Route path="reports" element={<ReportsPage />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="social" element={<SocialFeed />} />
+              <Route path="news" element={<NewsFeed />} />
               <Route path="profile" element={<AuthorityProfile />} />
               <Route path="authority" element={
                 <AuthorityRoute>
