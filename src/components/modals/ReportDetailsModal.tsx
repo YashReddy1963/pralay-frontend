@@ -22,7 +22,10 @@ interface Report {
   time: string;
   status: "verified" | "pending" | "discarded";
   description: string;
-  images: number;
+  images: {
+    id: string;
+    url?: string;
+  }[];
 }
 
 interface ReportDetailsModalProps {
@@ -88,7 +91,7 @@ export const ReportDetailsModal = ({ report, isOpen, onClose }: ReportDetailsMod
           {/* Hazard Type */}
           <div>
             <h3 className="font-semibold text-lg mb-2">
-              {t(`hazards.${report.type.toLowerCase().replace(/\s+/g, '')}`)}
+              {report.type}
             </h3>
             <p className="text-muted-foreground">{report.description}</p>
           </div>
@@ -116,19 +119,27 @@ export const ReportDetailsModal = ({ report, isOpen, onClose }: ReportDetailsMod
           <Separator />
 
           {/* Images */}
-          {report.images > 0 && (
+          {report.images && report.images.length > 0 && (
             <div>
               <h4 className="font-semibold mb-3 flex items-center space-x-2">
                 <Camera className="h-4 w-4" />
-                <span>Images ({report.images})</span>
+                <span>Images ({report.images.length})</span>
               </h4>
+          
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {Array.from({ length: report.images }).map((_, i) => (
-                  <div key={i} className="aspect-square bg-muted rounded-lg flex items-center justify-center text-muted-foreground border-2 border-dashed">
-                    <div className="text-center">
-                      <Camera className="h-8 w-8 mx-auto mb-2" />
-                      <p className="text-sm">Image {i + 1}</p>
-                    </div>
+                {report.images.map((image, i) => (
+                  <div key={image.id || i} className="aspect-square rounded-lg overflow-hidden border">
+                    {image.url ? (
+                      <img
+                        src={image.url}
+                        alt={`Hazard ${i + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
+                        <Camera className="h-6 w-6" />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

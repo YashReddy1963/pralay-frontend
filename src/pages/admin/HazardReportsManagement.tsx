@@ -47,7 +47,17 @@ const HazardReportsManagement = () => {
         if (response && response.success) {
           const serverReports = response.reports || [];
 
-          const mapped = serverReports.map((r: any) => {
+          // Normalize images on each server report so UI code can rely on `url`
+          const normalizedServerReports = serverReports.map((r: any) => {
+            const imgs = r.images || [];
+            const normalizedImages = imgs.map((img: any) => ({
+              ...img,
+              url: img.url || img.image_url || img.image || (img.image_file && (img.image_file.url || img.image_file)) || null,
+            }));
+            return { ...r, images: normalizedImages, images_count: r.images_count || normalizedImages.length || 0 };
+          });
+
+          const mapped = normalizedServerReports.map((r: any) => {
             // Map backend fields to the UI shape expected by this component
             const reportedAt = r.reported_at || r.created_at || r.reportedAt || r.reportedAt;
             const dateObj = reportedAt ? new Date(reportedAt) : null;
@@ -334,7 +344,7 @@ const HazardReportsManagement = () => {
               time: modalReport.time,
               status: (modalReport.status || '').toString().toLowerCase(),
               description: modalReport.description,
-              images: modalReport.raw?.images_count || (modalReport.hasImage ? 1 : 0),
+              images: modalReport.raw?.images || [],
             }}
             isOpen={detailsOpen}
             onClose={() => setDetailsOpen(false)}

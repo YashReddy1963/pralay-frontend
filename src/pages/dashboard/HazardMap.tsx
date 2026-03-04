@@ -133,9 +133,26 @@ const HazardMap = () => {
       };
 
       const response = await apiService.getMapHazardReports(filters);
-      
+
       if (response.success) {
-        setReports(response.reports || []);
+        const normalized = (response.reports || []).map((r: any) => {
+          const imgs = r.images || [];
+          const normalizedImages = imgs.map((img: any) => ({
+            ...img,
+            // Backend may return image.url or image.image_url or other shapes; prefer url but fall back
+            url: img.url || img.image_url || img.image || (img.image_file && (img.image_file.url || img.image_file)) || null,
+          }));
+
+          const images_count = r.images_count || normalizedImages.length || 0;
+          return {
+            ...r,
+            images: normalizedImages,
+            images_count,
+            has_images: images_count > 0,
+          };
+        });
+
+        setReports(normalized);
         
         // Show district filtering info for district chairmen
         if (user?.role === 'district_chairman' && response.filters_applied?.district_filtered) {

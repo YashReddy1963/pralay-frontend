@@ -110,7 +110,7 @@ const DistrictReports = () => {
     time: string;
     status: "verified" | "pending" | "discarded";
     description: string;
-    images: number;
+    images: any[];
     severity: "low" | "medium" | "high";
     reporter: string;
     reportedBy?: string;
@@ -158,15 +158,23 @@ const DistrictReports = () => {
       
       if (response.success) {
         let reports = response.reports || [];
-        
-        // If no district filter was applied on backend, filter on frontend
-        if (!user.district && reports.length > 0) {
-          // Show a message that district filtering is not available
-    
+
+        // Normalize images for each report so UI and modals can rely on `image.url`
+        const normalized = reports.map((r: any) => {
+          const imgs = r.images || [];
+          const normalizedImages = imgs.map((img: any) => ({
+            ...img,
+            url: img.url || img.image_url || img.image || (img.image_file && (img.image_file.url || img.image_file)) || null,
+          }));
+          return { ...r, images: normalizedImages, images_count: r.images_count || normalizedImages.length || 0 };
+        });
+
+        // If no district filter was applied on backend, keep showing all reports but normalized
+        if (!user.district && normalized.length > 0) {
           console.log("No district filter applied, showing all reports");
         }
-        
-        setReports(reports);
+
+        setReports(normalized);
       } else {
         toast.error("Failed to fetch reports");
       }
@@ -314,7 +322,7 @@ const DistrictReports = () => {
       reporter: report.reported_by.name,
       reportedBy: report.reported_by.name,
       source: "Citizen",
-      images: report.images_count,
+      images: report.images || [],   // ✅ FIX
       assignedTo: report.reviewed_by?.name || "Unassigned",
     });
     setDetailsOpen(true);
@@ -334,7 +342,7 @@ const DistrictReports = () => {
       reporter: report.reported_by.name,
       reportedBy: report.reported_by.name,
       source: "Citizen",
-      images: report.images_count,
+      images: report.images || [],
       assignedTo: report.reviewed_by?.name || "Unassigned",
     });
     setEditOpen(true);
@@ -354,7 +362,7 @@ const DistrictReports = () => {
       reporter: report.reported_by.name,
       reportedBy: report.reported_by.name,
       source: "Citizen",
-      images: report.images_count,
+      images: report.images || [],
       assignedTo: report.reviewed_by?.name || "Unassigned",
     });
     setTakeActionOpen(true);

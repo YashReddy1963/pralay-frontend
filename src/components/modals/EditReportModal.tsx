@@ -81,7 +81,7 @@ const EditReportModal = ({ isOpen, onClose, report, onSave }: EditReportModalPro
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <FileText className="h-5 w-5 text-primary" />
-            <span>{t("reports.editReport")}</span>
+            <span>Edit Report</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -95,7 +95,7 @@ const EditReportModal = ({ isOpen, onClose, report, onSave }: EditReportModalPro
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="type">{t("reports.type")}</Label>
+                <Label htmlFor="type">{report.type}</Label>
                 <Select 
                   value={formData.type || ""} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, type: value }))}
@@ -114,7 +114,7 @@ const EditReportModal = ({ isOpen, onClose, report, onSave }: EditReportModalPro
               </div>
 
               <div>
-                <Label htmlFor="location">{t("reportHazard.location")}</Label>
+                <Label htmlFor="location">Report Location</Label>
                 <Input
                   id="location"
                   value={formData.location || ""}
@@ -208,7 +208,7 @@ const EditReportModal = ({ isOpen, onClose, report, onSave }: EditReportModalPro
           </div>
 
           <div>
-            <Label htmlFor="description">{t("reportHazard.description")}</Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               value={formData.description || ""}

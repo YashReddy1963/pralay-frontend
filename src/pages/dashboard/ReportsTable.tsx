@@ -69,7 +69,23 @@ const ReportsTable = () => {
         const resp = await apiService.getHazardReports({ limit: 1000 } as any);
         if (resp && resp.success) {
           const server = resp.reports || [];
-          setReports(server.map((r: any) => mapServerToRow(r)));
+
+          // Normalize image objects on each report so downstream modals/components
+          // can rely on `image.url` and accurate images_count.
+          const normalizedServer = server.map((r: any) => {
+            const imgs = r.images || [];
+            const normalizedImages = imgs.map((img: any) => ({
+              ...img,
+              url: img.url || img.image_url || img.image || (img.image_file && (img.image_file.url || img.image_file)) || null,
+            }));
+            return {
+              ...r,
+              images: normalizedImages,
+              images_count: r.images_count || normalizedImages.length || 0,
+            };
+          });
+
+          setReports(normalizedServer.map((r: any) => mapServerToRow(r)));
         } else {
           // fallback: leave reports empty
           setReports([]);
@@ -114,7 +130,9 @@ const mapServerToRow = (r: any) => {
       time,
       status: r.status || 'pending',
       severity,
-      images: r.images_count || 0,
+      // pass the actual image objects (normalized earlier) so modals can render them
+      images: r.images || [],
+      images_count: r.images_count || (r.images ? r.images.length : 0),
       description: r.description || '',
       assignedTo:
         (r.reviewed_by && r.reviewed_by.name) || '',
@@ -449,7 +467,7 @@ const mapServerToRow = (r: any) => {
                     <TableCell>
                       <div className="flex items-center space-x-1">
                         <Camera className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-sm">{report.images}</span>
+                        <span className="text-sm">{report.images?.length || 0}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">{report.assignedTo}</TableCell>
