@@ -12,7 +12,8 @@ import {
   X,
   ArrowLeft,
   Users,
-  LogOut
+  LogOut,
+  UserCircle2
 } from "lucide-react";
 import { useState } from "react";
 import { useOfficialLanguage } from "@/contexts/LanguageContext";
@@ -35,6 +36,7 @@ const DashboardLayout = () => {
       { path: "/dashboard/analytics", icon: BarChart3, label: t("nav.analytics"), exact: false },
       { path: "/dashboard/social", icon: MessageCircle, label: t("nav.socialFeed"), exact: false },
       { path: "/dashboard/authority", icon: Users, label: t("Authority Dashboard"), exact: false },
+      { path: "/dashboard/profile", icon: UserCircle2, label: "Profile", exact: false },
       { path: "/dashboard/settings", icon: Settings, label: t("nav.settings"), exact: false },
     ];
 

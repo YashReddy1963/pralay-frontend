@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FileText, History, Settings, ArrowLeft, LogOut } from "lucide-react";
+import { FileText, History, Settings, ArrowLeft, LogOut, UserCircle2 } from "lucide-react";
 import { useCitizenLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ const CitizenLayout = () => {
   
   const navigationItems = [
     { path: "/citizen", icon: FileText, label: t("citizen.reportHazard.title"), exact: true },
+    { path: "/citizen/profile", icon: UserCircle2, label: t("nav.profile") },
     { path: "/citizen/history", icon: History, label: t("nav.history") },
     { path: "/citizen/settings", icon: Settings, label: t("nav.settings") },
   ];

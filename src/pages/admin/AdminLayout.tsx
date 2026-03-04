@@ -9,7 +9,8 @@ import {
   Menu,
   X,
   LogOut,
-  Settings
+  Settings,
+  UserCircle2
 } from "lucide-react";
 import { useState } from "react";
 import { useAdminLanguage } from "@/contexts/LanguageContext";
@@ -25,6 +26,7 @@ const AdminLayout = () => {
   
   const navigationItems = [
     { path: "/admin", icon: LayoutDashboard, label: t("admin.dashboard.title"), exact: true },
+    { path: "/admin/profile", icon: UserCircle2, label: "Profile" },
     { path: "/admin/officials", icon: Users, label: t("admin.officials.title") },
     { path: "/admin/reports", icon: FileText, label: t("admin.reports.title") },
     { path: "/admin/settings", icon: Settings, label: t("admin.settings.title") },
