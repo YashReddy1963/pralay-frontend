@@ -45,6 +45,21 @@ export interface AuthResponse {
   message: string;
 }
 
+export interface ProfileResponse {
+  success: boolean;
+  profile: User & {
+    username?: string;
+    middle_name?: string;
+    role_display?: string;
+    profile_picture_url?: string;
+    address?: string;
+    government_service_id?: string;
+    last_login_time?: string;
+    date_joined?: string;
+  };
+  message?: string;
+}
+
 class ApiService {
   private baseURL: string;
 
@@ -67,64 +82,72 @@ class ApiService {
     options: RequestInit = {},
     retryOnAuth = true
   ): Promise<T> {
-  
     const url = `${this.baseURL}${endpoint}`;
+    
+    // Check if the request body is FormData
     const isFormData = options.body instanceof FormData;
-  
-    const buildHeaders = () => {
-      const freshToken = localStorage.getItem('authToken');
-  
-      return {
-        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        'X-Requested-With': 'XMLHttpRequest',
-        ...(freshToken ? { 'Authorization': `Bearer ${freshToken}` } : {}),
+
+    const defaultHeaders: Record<string, string> = {
+      // Set Content-Type ONLY if it's NOT FormData (browser handles multipart/form-data)
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }), 
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRFToken': this.getCsrfToken(),
+    };
+
+    // Note: We're using session-based authentication (cookies), not Bearer tokens
+    // The token is stored but not sent in headers - Django handles authentication via sessions
+    const token = this.getAuthToken();
+    if (token) {
+      console.log('🔐 API Service: Token available but using session auth for', endpoint);
+    } else {
+      console.log('🔐 API Service: No auth token available for', endpoint);
+    }
+
+    const config: RequestInit = {
+      ...options,
+      credentials: 'include', // Always include cookies for session authentication
+      headers: {
+        ...defaultHeaders,
         ...options.headers,
-      };
+      },
     };
-  
-    const makeFetch = async () => {
-      return fetch(url, {
-        ...options,
-        credentials: 'include',
-        headers: buildHeaders(),
-      });
-    };
-  
-    let response = await makeFetch();
-  
-    // 🔥 If unauthorized, try refresh ONCE
-    if (response.status === 401 && retryOnAuth && this.getRefreshToken()) {
-      try {
-        console.log("🔄 Attempting token refresh...");
-        await this.refreshToken();
-  
-        // Retry with NEW token
-        response = await fetch(url, {
-          ...options,
-          credentials: 'include',
-          headers: buildHeaders(), // 🔥 rebuild headers with NEW token
-        });
-  
-      } catch (refreshError) {
-        this.clearAuth();
-        window.location.href = '/';
-        throw new Error('Session expired. Please login again.');
+
+    try {
+      const response = await fetch(url, config);
+      
+      // If unauthorized and we have a refresh token, try to refresh
+      if (response.status === 401 && retryOnAuth && this.getRefreshToken()) {
+        try {
+          await this.refreshToken();
+          // Retry the original request with new token
+          return this.request<T>(endpoint, options, false);
+        } catch (refreshError) {
+          // Refresh failed, clear auth and redirect to login
+          this.clearAuth();
+          window.location.href = '/';
+          throw new Error('Session expired. Please login again.');
+        }
       }
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = HTTP error! status: ${response.status};
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('API request failed:', error);
+      throw error;
     }
-  
-    if (!response.ok) {
-      const errorText = await response.text();
-      let errorMessage = `HTTP error! status: ${response.status}`;
-      try {
-        const errorData = JSON.parse(errorText);
-        errorMessage = errorData.error || errorMessage;
-      } catch {}
-      throw new Error(errorMessage);
-    }
-  
-    return response.json();
   }
-  
 
   // Authentication methods
   async login(credentials: LoginRequest): Promise<AuthResponse> {
@@ -232,6 +255,33 @@ class ApiService {
 
   async getCurrentUser(): Promise<User> {
     return this.request<User>('/api/auth/me/');
+  }
+
+  async getProfile(): Promise<ProfileResponse> {
+    return this.request<ProfileResponse>('/api/auth/profile/', {
+      method: 'GET',
+    });
+  }
+
+  async updateProfile(profileData: {
+    first_name?: string;
+    middle_name?: string;
+    last_name?: string;
+    phone_number?: string;
+    state?: string;
+    district?: string;
+    nagar_panchayat?: string;
+    village?: string;
+    address?: string;
+    remove_profile_picture?: boolean;
+  } | FormData): Promise<ProfileResponse> {
+    const body = profileData instanceof FormData ? profileData : JSON.stringify(profileData);
+    const method = profileData instanceof FormData ? 'POST' : 'PATCH';
+
+    return this.request<ProfileResponse>('/api/auth/profile/', {
+      method,
+      body,
+    });
   }
 
   // User management methods

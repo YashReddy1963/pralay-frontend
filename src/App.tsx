@@ -23,6 +23,7 @@ import CitizenLayout from "./pages/citizen/CitizenLayout";
 import ReportHazard from "./pages/citizen/ReportHazard";
 import ReportHistory from "./pages/citizen/ReportHistory";
 import CitizenSettings from "./pages/citizen/Settings";
+import CitizenProfile from "./pages/citizen/Profile";
 
 // Dashboard
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
@@ -32,6 +33,7 @@ import Analytics from "./pages/dashboard/Analytics";
 import SocialFeed from "./pages/dashboard/SocialFeed";
 import AuthorityDashboard from "./pages/dashboard/AuthorityDashboard";
 import OfficialSettings from "./pages/dashboard/Settings";
+import AuthorityProfile from "./pages/dashboard/AuthorityProfile";
 
 // Admin Panel
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -39,6 +41,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import OfficialsManagement from "./pages/admin/OfficialsManagement";
 import HazardReportsManagement from "./pages/admin/HazardReportsManagement";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminProfile from "./pages/admin/AdminProfile";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +70,7 @@ const App = () => (
               </CitizenRoute>
             }>
               <Route index element={<ReportHazard />} />
+              <Route path="profile" element={<CitizenProfile />} />
               <Route path="history" element={<ReportHistory />} />
               <Route path="settings" element={<CitizenSettings />} />
             </Route>
@@ -83,6 +87,7 @@ const App = () => (
               <Route path="reports" element={<ReportsPage />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="social" element={<SocialFeed />} />
+              <Route path="profile" element={<AuthorityProfile />} />
               <Route path="authority" element={
                 <AuthorityRoute>
                   <AuthorityDashboard />
@@ -100,6 +105,7 @@ const App = () => (
               </AdminRoute>
             }>
               <Route index element={<AdminDashboard />} />
+              <Route path="profile" element={<AdminProfile />} />
               <Route path="officials" element={<OfficialsManagement />} />
               <Route path="reports" element={<HazardReportsManagement />} />
               <Route path="settings" element={<AdminSettings />} />
