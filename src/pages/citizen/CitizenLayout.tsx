@@ -14,7 +14,7 @@ const CitizenLayout = () => {
   
   const navigationItems = [
     { path: "/citizen", icon: FileText, label: t("citizen.reportHazard.title"), exact: true },
-    { path: "/citizen/profile", icon: UserCircle2, label: t("nav.profile") },
+    { path: "/citizen/profile", icon: UserCircle2, label: "Profile" },
     { path: "/citizen/history", icon: History, label: t("nav.history") },
     { path: "/citizen/settings", icon: Settings, label: t("nav.settings") },
   ];

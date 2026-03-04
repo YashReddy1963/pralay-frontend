@@ -1508,35 +1508,25 @@ let district = rawDistrict
     }
   };
 
-  const runFormVerification = async () => {
-    setIsVerifying(true);
-    try {
-      const result = await verifyFormData();
-      setFormVerified(result.status === 'verified');
-      
-      if (result.status === 'verified') {
-        toast({
-          title: "Form verified",
-          description: "All data has been verified successfully.",
-        });
-      } else {
-        toast({
-          title: "Form verification failed",
-          description: result.message,
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Verification error",
-        description: "Failed to verify form data. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsVerifying(false);
-    }
-  };
+const runFormVerification = async () => {
+  setIsVerifying(true);
+  try {
+    const result = await verifyFormData();
+    setFormVerified(result.status === 'verified');
 
+    if (result.status === 'verified') {
+      toast({
+        title: "Form verified",
+        description: "All data has been verified successfully.",
+      });
+    }
+
+  } catch (error) {
+    console.error("Form verification error:", error);
+  } finally {
+    setIsVerifying(false);
+  }
+};
 
   // Video recording functions
   const startVideoRecording = async () => {
@@ -2003,14 +1993,12 @@ let district = rawDistrict
 
     // Run final form verification
     await runFormVerification();
-    
+
+    // NOTE: removed the blocking "Form not verified" toast per user request.
+    // If verification fails, we allow submission to proceed (silent fallback).
     if (!formVerified) {
-      toast({
-        title: "Form not verified",
-        description: "Please complete verification before submitting.",
-        variant: "destructive",
-      });
-      return;
+      console.warn('Form verification failed but submission will proceed (verification toast removed)');
+      // proceed without showing a destructive toast or blocking the submission
     }
 
     setIsSubmitting(true);

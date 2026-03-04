@@ -98,7 +98,8 @@ class ApiService {
     // The token is stored but not sent in headers - Django handles authentication via sessions
     const token = this.getAuthToken();
     if (token) {
-      console.log('🔐 API Service: Token available but using session auth for', endpoint);
+      defaultHeaders['Authorization'] = `Bearer ${token}`;
+      console.log('🔐 API Service: Sending Bearer token for', endpoint);
     } else {
       console.log('🔐 API Service: No auth token available for', endpoint);
     }
@@ -131,7 +132,7 @@ class ApiService {
       
       if (!response.ok) {
         const errorText = await response.text();
-        let errorMessage = HTTP error! status: ${response.status};
+        let errorMessage = `HTTP error! status: ${response.status}`;
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.error || errorMessage;
