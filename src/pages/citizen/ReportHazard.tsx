@@ -750,40 +750,9 @@ let district = rawDistrict
         }
       }
 
-      // Check if captured photo scenario matches hazard type and description
+      // Directly verify captured photo (same behavior as upload)
       if (formData.type && formData.description.trim()) {
-        // Analyze the actual image content to check if it matches the hazard type and description
-        const imageContentMatch = await analyzeImageContentMatch(file, formData.type, formData.description);
-        
-        if (imageContentMatch.matches) {
-          // Photo content matches - proceed with verification
-          runImageVerification(file);
-          toast({
-            title: "Photo content matches",
-            description: `Captured photo shows "${formData.type}" scenario matching your description. Verifying...`,
-            variant: "default",
-          });
-        } else {
-          // Photo content doesn't match - don't verify and remove photo
-          toast({
-            title: "Photo content mismatch",
-            description: `Captured photo does not show "${formData.type}" scenario. ${imageContentMatch.reason}. Please take a photo that matches your report.`,
-            variant: "destructive",
-          });
-          
-          // Remove the photo since it doesn't match
-          setFormData(prev => ({
-            ...prev,
-            images: prev.images.filter((_, i) => i !== prev.images.length - 1)
-          }));
-          
-          // Also remove from image locations if it was added
-          setImageLocations(prev => {
-            const newLocations = { ...prev };
-            delete newLocations[fileName];
-            return newLocations;
-          });
-        }
+        runImageVerification(file);
       } else {
         toast({
           title: "Verification pending",
