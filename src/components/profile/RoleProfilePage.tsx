@@ -5,9 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { toPng } from "html-to-image";
+import JsBarcode from "jsbarcode";
+import PralayLogo from "@/pages/images/Pralay-logo.png";
 import {
   UserCircle2,
   Mail,
@@ -80,16 +84,36 @@ const RoleProfilePage = ({ title, subtitle, accentClassName = "from-primary/10 v
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isIdCardOpen, setIsIdCardOpen] = useState(false);
+  const [isDownloadingIdCard, setIsDownloadingIdCard] = useState(false);
 
   const [selectedProfileImage, setSelectedProfileImage] = useState<File | null>(null);
   const [profilePreviewUrl, setProfilePreviewUrl] = useState<string | null>(null);
   const [removeProfilePicture, setRemoveProfilePicture] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const idCardRef = useRef<HTMLDivElement>(null);
+  const barcodeCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [barcodeImgUrl, setBarcodeImgUrl] = useState<string | null>(null);
 
   const fullName = useMemo(() => {
     if (!profile) return "User";
     return [profile.first_name, profile.middle_name, profile.last_name].filter(Boolean).join(" ") || "User";
+  }, [profile]);
+
+  const displayRole = useMemo(() => profile?.custom_role || profile?.role_display || profile?.role || "User", [profile]);
+
+  const displayLocation = useMemo(() => {
+    if (!profile) return "State- —";
+    return `State- ${profile.state || "—"}`;
+  }, [profile]);
+
+  const uniqueCardId = useMemo(() => {
+    const userId = String(profile?.id ?? "0").padStart(4, "0");
+    const govId = String(profile?.government_service_id || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const emailPart = String(profile?.email || "").split("@")[0].replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const seed = (govId || `${emailPart}${userId}`).slice(0, 10) || `PRALAY${userId}`;
+    return `PRL${userId}${seed}`;
   }, [profile]);
 
   const loadProfile = async () => {
@@ -285,6 +309,65 @@ const RoleProfilePage = ({ title, subtitle, accentClassName = "from-primary/10 v
     };
   }, [profilePreviewUrl]);
 
+  useEffect(() => {
+    if (!uniqueCardId) return;
+
+    const canvas = barcodeCanvasRef.current;
+    if (!canvas) return;
+
+    // determine desired barcode width based on id card container, fallback to 400
+    const containerWidth = idCardRef.current?.clientWidth || 430;
+    const targetWidth = Math.max(200, Math.round(containerWidth * 0.92));
+    const targetHeight = 64;
+
+    // set canvas size and render barcode into it
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+
+    JsBarcode(canvas, uniqueCardId, {
+      format: "CODE128",
+      displayValue: false,
+      lineColor: "#000000",
+      width: 0.9,
+      height: targetHeight,
+      margin: 6,
+    });
+
+    try {
+      const dataUrl = canvas.toDataURL("image/png");
+      setBarcodeImgUrl(dataUrl);
+    } catch (err) {
+      // ignore
+      setBarcodeImgUrl(null);
+    }
+  }, [uniqueCardId, isIdCardOpen]);
+
+  const onDownloadIdCard = async () => {
+    if (!idCardRef.current) return;
+
+    setIsDownloadingIdCard(true);
+    try {
+      const dataUrl = await toPng(idCardRef.current, {
+        cacheBust: true,
+        pixelRatio: 3,
+        backgroundColor: "#ffffff",
+      });
+
+      const link = document.createElement("a");
+      link.download = `${fullName.replace(/\s+/g, "_") || "pralay"}_id_card.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      toast({
+        title: "Download failed",
+        description: "Unable to download ID card. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloadingIdCard(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="p-6">
@@ -345,10 +428,102 @@ const RoleProfilePage = ({ title, subtitle, accentClassName = "from-primary/10 v
             </div>
 
             {!isEditing ? (
-              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                <Edit3 className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
+              <div className="flex gap-2">
+                <Dialog open={isIdCardOpen} onOpenChange={setIsIdCardOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      ID Card
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-[420px] p-4 sm:p-5">
+                    <DialogHeader>
+                      <DialogTitle>Official ID Card</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="space-y-3">
+                      <div
+                        ref={idCardRef}
+                        className="relative mx-auto h-[760px] w-[430px] max-w-full overflow-hidden rounded-[22px] border border-sky-200 bg-[#F7FAFF] text-[#0F172A]"
+                      >
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(2,132,199,0.08),transparent_45%),radial-gradient(circle_at_80%_65%,rgba(14,165,233,0.1),transparent_40%)]" />
+
+                        <div className="absolute -top-28 left-1/2 h-56 w-[700px] -translate-x-[60%] rounded-[50%] bg-gradient-to-r from-[#003EBA] via-[#0078E7] to-[#14B8EA]" />
+                        <div className="absolute -top-24 left-1/2 h-48 w-[640px] -translate-x-[58%] rounded-[50%] bg-[#F7FAFF]" />
+                        <div className="absolute -bottom-20 left-1/2 h-48 w-[760px] -translate-x-[62%] rounded-[50%] bg-gradient-to-r from-[#003EBA] via-[#0078E7] to-[#14B8EA]" />
+
+                        <div className="relative z-10 flex h-full flex-col px-8 py-8">
+                          <div className="flex items-center gap-3">
+                            <div className="h-16 w-16 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-slate-200">
+                              <img src={PralayLogo} alt="Pralay" className="h-full w-full object-contain" />
+                            </div>
+                            <h3 className="text-[48px] font-bold leading-none text-[#1C64B0]">Pralay</h3>
+                          </div>
+
+                          <div className="mt-8 self-center rounded-full border-[6px] border-[#1295E3] p-1">
+                            <div className="h-52 w-52 overflow-hidden rounded-full bg-slate-100">
+                              {profilePreviewUrl || (profile?.profile_picture_url && !removeProfilePicture) ? (
+                                <img
+                                  src={profilePreviewUrl || profile?.profile_picture_url}
+                                  alt={fullName}
+                                  className="h-full w-full object-cover"
+                                  crossOrigin="anonymous"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center bg-slate-200">
+                                  <UserCircle2 className="h-20 w-20 text-slate-500" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="mt-6 text-center px-2">
+                            <h4 className="text-[24px] font-bold leading-tight tracking-tight text-black">{fullName}</h4>
+                            <p className="mt-2 text-[16px] font-medium leading-none text-slate-800">{displayRole}</p>
+                            <p className="mt-2 text-[14px] leading-none text-slate-700">{displayLocation}</p>
+                          </div>
+
+                          <div className="mx-auto mt-4 h-[2px] w-[88%] bg-[#1D6FB7]/80" />
+
+                          <div className="mt-5 space-y-2 text-[14px] leading-tight text-slate-900">
+                            <div className="flex gap-2">
+                              <span className="min-w-[64px] text-slate-600">Email</span>
+                              <span className="break-all">{profile?.email || "—"}</span>
+                            </div>
+                            <div className="flex gap-2">
+                              <span className="min-w-[64px] text-slate-600">Phone</span>
+                              <span>{profile?.phone_number || "—"}</span>
+                            </div>
+                            <div className="flex gap-2">
+                              <span className="min-w-[64px] text-slate-600">Gov ID</span>
+                              <span>{profile?.government_service_id || "—"}</span>
+                            </div>
+                          </div>
+
+                          <div className="mt-auto rounded-2xl bg-white/95 px-6 py-6 shadow-sm ring-1 ring-slate-200 flex flex-col items-center justify-center">
+                            {barcodeImgUrl ? (
+                              <img src={barcodeImgUrl} alt={`Barcode ${uniqueCardId}`} className="block h-[72px] w-[92%] max-w-full object-contain" />
+                            ) : (
+                              <canvas ref={barcodeCanvasRef} style={{ display: "none" }} />
+                            )}
+                            <p className="mt-2 text-center text-[12px] tracking-[0.15em] text-slate-600">ID {uniqueCardId}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button className="w-full" onClick={onDownloadIdCard} disabled={isDownloadingIdCard}>
+                        <Download className="h-4 w-4 mr-2" />
+                        {isDownloadingIdCard ? "Downloading..." : "Download ID Card"}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              </div>
             ) : (
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={onCancel} disabled={isSaving}>
