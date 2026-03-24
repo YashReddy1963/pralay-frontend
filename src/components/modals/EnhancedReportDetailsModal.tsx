@@ -70,106 +70,6 @@ interface EnhancedReportDetailsModalProps {
   onClose: () => void;
 }
 
-// Reusable lifecycle tracker component (placed in same file as requested)
-const ReportLifecycleTracker = ({ status }: { status: string }) => {
-  const steps = ["submitted", "pending", "approved", "action", "closed"];
-
-  const getCurrentStepIndex = (s: string) => {
-    switch (s) {
-      case "pending":
-        return 1; // Report Submitted + Pending Authority
-      case "verified":
-        return 2; // Approved
-      case "under_investigation":
-        return 3; // Action Taken
-      case "resolved":
-        return 4; // Closed
-      default:
-        return 0; // fallback to submitted
-    }
-  };
-
-  // If discarded, show a red rejected banner instead
-  if (status === "discarded") {
-    return (
-      <div className="rounded-md bg-red-50 border border-red-200 p-3 text-red-800 flex items-center gap-3">
-        <XCircle className="h-5 w-5 text-red-500" />
-        <div>
-          <div className="font-semibold">Report Rejected</div>
-          <div className="text-sm text-red-700">This report was discarded by authorities.</div>
-        </div>
-      </div>
-    );
-  }
-
-  const current = getCurrentStepIndex(status);
-
-  const icons: Record<string, JSX.Element> = {
-    submitted: <FileText className="h-4 w-4" />,
-    pending: <Clock className="h-4 w-4" />,
-    approved: <CheckCircle className="h-4 w-4" />,
-    action: <AlertTriangle className="h-4 w-4" />,
-    closed: <CheckCircle className="h-4 w-4" />,
-  };
-
-  const labels: Record<string, string> = {
-    submitted: "Report Submitted",
-    pending: "Pending Authority",
-    approved: "Approved",
-    action: "Action Taken",
-    closed: "Closed",
-  };
-
-  const messages: Record<string, string> = {
-    submitted: "Report successfully submitted.",
-    pending: "Currently under review by authorities",
-    approved: "Report approved by authority",
-    action: "Field teams taking action",
-    closed: "Issue resolved and closed",
-  };
-
-  return (
-    <div className="my-4">
-      <div className="flex items-center gap-4">
-        {steps.map((step, idx) => {
-          const isCompleted = idx < current;
-          const isActive = idx === current;
-
-          return (
-            <div className="flex items-center" key={step}>
-              <div className="flex flex-col items-center">
-                <div
-                  className={`rounded-full h-9 w-9 flex items-center justify-center transition-transform duration-200 ease-in-out
-                    ${isCompleted ? 'bg-green-500 text-white scale-100' : isActive ? 'bg-blue-500 text-white animate-pulse scale-105 ring-4 ring-blue-200/40' : 'bg-gray-100 text-gray-600'}`}
-                >
-                  {icons[step]}
-                </div>
-                <div className="mt-2 text-xs text-center w-24">
-                  <div className={`${isCompleted ? 'text-green-700' : isActive ? 'text-blue-600' : 'text-gray-500'}`}>{labels[step]}</div>
-                </div>
-              </div>
-
-              {/* Connector - don't render after last */}
-              {idx < steps.length - 1 && (
-                <div className={`h-0.5 flex-1 mx-4 self-center ${idx < current ? 'bg-green-300' : 'bg-gray-200'}`} />
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Small helper text under current step */}
-      <div className="mt-3 text-sm text-muted-foreground">
-        <div className="w-full flex justify-center">
-          <span className="text-xs text-center">
-            {messages[steps[current]]}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: EnhancedReportDetailsModalProps) => {
   const { t } = useTranslation();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -279,9 +179,6 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
           </div>
 
           <Separator />
-
-          {/* Report lifecycle tracker (new) */}
-          <ReportLifecycleTracker status={report.status} />
 
           {/* Location and Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

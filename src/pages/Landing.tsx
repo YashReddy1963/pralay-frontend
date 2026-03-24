@@ -510,9 +510,7 @@ const Landing = () => {
           </div>
         </section>
 
-        {/*
-        
-                <section className="relative overflow-hidden border-y border-border/60 bg-gradient-to-b from-primary/[0.08] via-background to-background">
+        <section className="relative overflow-hidden border-y border-border/60 bg-gradient-to-b from-primary/[0.08] via-background to-background">
           <div className="absolute -left-16 top-8 h-64 w-64 rounded-full bg-primary/10 blur-3xl" aria-hidden="true" />
           <div className="absolute -right-20 bottom-8 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" aria-hidden="true" />
 
@@ -577,8 +575,6 @@ const Landing = () => {
             </div>
           </div>
         </section>
-        */}
-
 
         <section className="relative overflow-hidden bg-gradient-to-r from-slate-950 via-blue-950 to-cyan-950">
           <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400/20 blur-3xl" aria-hidden="true" />
