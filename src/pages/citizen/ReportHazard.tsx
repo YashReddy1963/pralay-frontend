@@ -14,6 +14,7 @@ import { saveOfflineReport } from "@/utils/offlineDB";
 import { Value } from "@radix-ui/react-select";
 
 const ReportHazard = () => {
+  const [isPremium, setIsPremium] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isOnline] = useState(navigator.onLine);
@@ -92,6 +93,37 @@ const ReportHazard = () => {
       window.removeEventListener('online', triggerSync);
     };
   }, []);
+
+   useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+
+      const res = await fetch(
+        "https://pralay-backend-1.onrender.com/api/profile/",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        console.error("Profile API failed:", res.status);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("PROFILE DATA:", data);
+
+      setIsPremium(Boolean(data.is_premium));
+    } catch (err) {
+      console.error("Profile fetch error:", err);
+    }
+  };
+
+  fetchProfile();
+}, []);
 
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
@@ -2122,6 +2154,18 @@ const runFormVerification = async () => {
       // OFFLINE CHECK
       if (!navigator.onLine) {
       
+        // 🚨 Check premium BEFORE saving offline
+        if (!isPremium) {
+          toast({
+            title: "Premium Required",
+            description: "Offline reporting is available for premium users only.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      
+        // ✅ Allow offline save ONLY for premium users
         const offlineReport = {
           id: crypto.randomUUID(),
           data: submissionData,
@@ -2680,16 +2724,21 @@ const runFormVerification = async () => {
             {/* Submit Button */}
             <Button
               type="button"
-              variant="destructive"
-              className="w-full font-semibold py-3 text-lg"
+              variant="outline"
               onClick={sendViaSMS}
+              disabled={!isPremium}
+className={`w-full font-semibold py-3 text-lg border-red-500 
+  ${isPremium 
+    ? "text-red-600 hover:bg-red-50" 
+    : "text-gray-400 border-gray-300 cursor-not-allowed"
+  }`}
             >
-              🚨 Report via Emergency SMS
+              🚨 Send Emergency Alert via SMS
             </Button>
             <Button
               type="submit"
               className="w-full bg-gradient-sunset text-white font-semibold py-3 text-lg"
-              disabled={isSubmitting || isVerifying || !formVerified}
+              disabled={isSubmitting || isVerifying || !formVerified || (!navigator.onLine && !isPremium)}
             >
               {isSubmitting ? (
                 <>

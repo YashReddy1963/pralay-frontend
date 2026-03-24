@@ -24,6 +24,7 @@ import { useCitizenLanguage } from "@/contexts/LanguageContext";
 const Settings = () => {
   const { toast } = useToast();
   const { language, setLanguage, t } = useCitizenLanguage();
+  const [isPremium, setIsPremium] = useState(false);
   const [settings, setSettings] = useState({
     language: "en",
     autoLocation: true,
@@ -33,6 +34,98 @@ const Settings = () => {
     offlineReports: true,
     theme: (localStorage.getItem("theme:citizen") as "light" | "dark") || "light",
   });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+
+        const res = await fetch(
+          "https://pralay-backend-1.onrender.com/api/profile/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+        setIsPremium(data.is_premium);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleBuyPremium = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+
+      // STEP 1: Create Order
+      const res = await fetch(
+        "https://pralay-backend-1.onrender.com/api/create-order/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      const options = {
+        key: data.key,
+        amount: data.amount,
+        currency: "INR",
+        name: "Pralay Premium",
+        description: "Unlock Offline Features",
+        order_id: data.order_id,
+
+        handler: async function (response: any) {
+          // STEP 2: VERIFY PAYMENT
+          const verifyRes = await fetch(
+            "https://pralay-backend-1.onrender.com/api/verify-payment/",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                order_id: response.razorpay_order_id,
+                payment_id: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+              }),
+            }
+          );
+
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.status === "success") {
+            setIsPremium(true);
+
+            toast({
+              title: "Payment Successful 🎉",
+              description: "Premium unlocked!",
+            });
+          }
+        },
+
+        theme: {
+          color: "#1e40af",
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", settings.theme === "dark");
@@ -78,6 +171,31 @@ const Settings = () => {
 
   return (
     <div className="p-4 pb-20 space-y-6">
+
+      {/* Premium Features */}
+      <Card className="border-2 border-yellow-400">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>🚀 Premium Features</span>
+            {isPremium && <span className="text-green-500 text-sm">Active</span>}
+          </CardTitle>
+        </CardHeader>
+
+        <CardContent className="space-y-3">
+          <ul className="text-sm space-y-1 text-muted-foreground">
+            <li>✅ Offline Report Submission</li>
+            <li>✅ Auto Sync when online</li>
+            <li>✅ Priority Processing</li>
+          </ul>
+
+          {!isPremium && (
+            <Button onClick={handleBuyPremium} className="w-full bg-yellow-500 text-white">
+              Unlock Premium (₹20)
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Appearance */}
       <Card>
         <CardHeader>
