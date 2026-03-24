@@ -56,7 +56,7 @@ const ReportHazard = () => {
 
  
   const hazardTypes = [
-    { value: "water_disaster", label: "Water Disaster" },
+    { value: "tsunami", label: "Tsunami Warning" },
     { value: "oil_spill", label: "Oil Spill" },
     { value: "coral_bleaching", label: "Coral Bleaching" },
     { value: "normal", label: "Normal Condition" },
