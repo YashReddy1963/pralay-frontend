@@ -243,9 +243,15 @@ let district = rawDistrict
 
   // Generate SMS payload with better handling of missing/invalid location data
   const generateSMSPayload = () => {
-    const [lat, lng] = formData.location.split(',').map(coord => coord?.trim());
-    
-    return `PRALAY|${formData.type}|${lat || 'NA'},${lng || 'NA'}|${formData.description.slice(0, 100)}`;
+    const [lat, lng] = formData.location.split(',').map(c => c?.trim());
+
+    return `🚨 PRALAY HAZARD ALERT 🚨
+    Type: ${formData.type}
+    Location: ${lat || 'NA'}, ${lng || 'NA'}
+    Description: ${formData.description.slice(0, 120)}
+      
+    Time: ${new Date().toLocaleString()}
+    Source: PRALAY PWA`;
   };
 
   const sendViaSMS = () => {
