@@ -553,19 +553,6 @@ class ApiService {
     });
   }
 
-  // Report lifecycle helpers
-  async takeAction(reportId: string): Promise<any> {
-    return this.request(`/api/reports/${encodeURIComponent(reportId)}/take-action/`, {
-      method: 'PATCH',
-    });
-  }
-
-  async markResolved(reportId: string): Promise<any> {
-    return this.request(`/api/reports/${encodeURIComponent(reportId)}/mark-resolved/`, {
-      method: 'PATCH',
-    });
-  }
-
   // User-specific reports API methods
   async getUserReports(): Promise<any> {
     return this.request('/api/hazard-reports/?user_reports=true', {
