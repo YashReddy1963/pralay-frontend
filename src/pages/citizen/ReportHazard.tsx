@@ -2672,16 +2672,14 @@ const runFormVerification = async () => {
             </div>
 
             {/* Submit Button */}
-            {!navigator.onLine && (
-              <Button
-                type="button"
-                variant="destructive"
-                className="w-full font-semibold py-3 text-lg"
-                onClick={sendViaSMS}
-              >
-                🚨 Send Emergency SMS
-              </Button>
-            )}
+            <Button
+              type="button"
+              variant="destructive"
+              className="w-full font-semibold py-3 text-lg"
+              onClick={sendViaSMS}
+            >
+              🚨 Report via Emergency SMS
+            </Button>
             <Button
               type="submit"
               className="w-full bg-gradient-sunset text-white font-semibold py-3 text-lg"
