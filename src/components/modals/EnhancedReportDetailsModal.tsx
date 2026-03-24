@@ -175,6 +175,19 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
   const [imageUrls, setImageUrls] = useState<{[key: string]: string}>({});
+  const [localStatus, setLocalStatus] = useState<Report['status']>(report.status);
+
+  // current user from localStorage (if present)
+  let currentUser: any = null;
+  if (typeof window !== 'undefined') {
+    try {
+      currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+    } catch (e) {
+      currentUser = null;
+    }
+  }
+  const currentUserId = currentUser && (currentUser as any).id ? (currentUser as any).id : null;
+  const currentUserRole = currentUser && (currentUser as any).role ? ((currentUser as any).role as string).toLowerCase() : null;
 
   // Don't render if report is null
   if (!report) {
@@ -256,9 +269,9 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>{t("citizen.history.viewDetails")}</span>
-            <Badge className={getStatusColor(report.status)}>
-              {getStatusIcon(report.status)}
-              <span className="ml-1">{t(`status.${report.status}`)}</span>
+            <Badge className={getStatusColor(localStatus)}>
+              {getStatusIcon(localStatus)}
+              <span className="ml-1">{t(`status.${localStatus}`)}</span>
             </Badge>
           </DialogTitle>
         </DialogHeader>
@@ -281,7 +294,7 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
           <Separator />
 
           {/* Report lifecycle tracker (new) */}
-          <ReportLifecycleTracker status={report.status} />
+          <ReportLifecycleTracker status={localStatus} />
 
           {/* Location and Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -462,12 +475,12 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
               <AlertTriangle className="h-4 w-4" />
               <span>Report Status</span>
             </h4>
-            <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-sm">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Current Status:</span>
-                <Badge className={getStatusColor(report.status)}>
-                  {getStatusIcon(report.status)}
-                  <span className="ml-1">{t(`status.${report.status}`)}</span>
+                <Badge className={getStatusColor(localStatus)}>
+                  {getStatusIcon(localStatus)}
+                  <span className="ml-1">{t(`status.${localStatus}`)}</span>
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
@@ -482,27 +495,27 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
                   <span>{(report.ai_verification_score * 100).toFixed(1)}%</span>
                 </div>
               )}
-              {report.status === "verified" && (
+              {localStatus === "verified" && (
                 <p className="text-green-600 text-xs">
                   ✓ This report has been verified by officials and action has been taken.
                 </p>
               )}
-              {report.status === "pending" && (
+              {localStatus === "pending" && (
                 <p className="text-yellow-600 text-xs">
                   ⏳ This report is under review by officials.
                 </p>
               )}
-              {report.status === "discarded" && (
+              {localStatus === "discarded" && (
                 <p className="text-red-600 text-xs">
                   ✗ This report was determined to be invalid or duplicate.
                 </p>
               )}
-              {report.status === "under_investigation" && (
+              {localStatus === "under_investigation" && (
                 <p className="text-blue-600 text-xs">
                   🔍 This report is currently under investigation.
                 </p>
               )}
-              {report.status === "resolved" && (
+              {localStatus === "resolved" && (
                 <p className="text-green-600 text-xs">
                   ✅ This report has been resolved and action has been completed.
                 </p>
@@ -512,6 +525,44 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
 
           {/* Actions */}
           <div className="flex justify-end space-x-2">
+            {/* Authority: Take Action button */}
+            {currentUserRole && ['state_chairman','district_chairman','nagar_panchayat_chairman','village_sarpanch'].includes(currentUserRole) && (
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  try {
+                    await apiService.takeAction(report.report_id);
+                    setLocalStatus('under_investigation');
+                    toast.success('Authorities have started taking action');
+                  } catch (err) {
+                    console.error('Take action failed', err);
+                    toast.error('Failed to initiate action');
+                  }
+                }}
+              >
+                Take Action
+              </Button>
+            )}
+
+            {/* Citizen: Mark as Resolved button (only report owner and when under_investigation) */}
+            {currentUserId && localStatus === 'under_investigation' && currentUserId === report.reported_by.id && (
+              <Button
+                variant="secondary"
+                onClick={async () => {
+                  try {
+                    await apiService.markResolved(report.report_id);
+                    setLocalStatus('resolved');
+                    toast.success('Report marked as resolved');
+                  } catch (err) {
+                    console.error('Mark resolved failed', err);
+                    toast.error('Failed to mark report as resolved');
+                  }
+                }}
+              >
+                Mark as Resolved
+              </Button>
+            )}
+
             <Button variant="outline" onClick={onClose}>
               {t("common.close")}
             </Button>
