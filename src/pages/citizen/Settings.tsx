@@ -105,8 +105,16 @@ const Settings = () => {
           const verifyData = await verifyRes.json();
 
           if (verifyData.status === "success") {
-            setIsPremium(true);
-
+            // 🔥 REFETCH PROFILE FROM BACKEND
+            const res = await fetch("/api/profile/", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          
+            const data = await res.json();
+            setIsPremium(Boolean(data.is_premium));
+          
             toast({
               title: "Payment Successful 🎉",
               description: "Premium unlocked!",
