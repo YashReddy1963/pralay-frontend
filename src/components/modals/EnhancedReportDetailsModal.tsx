@@ -174,6 +174,7 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
   const { t } = useTranslation();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const [imageUrls, setImageUrls] = useState<{[key: string]: string}>({});
 
   // Don't render if report is null
@@ -248,6 +249,36 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
 
   const openImageInNewTab = (imageUrl: string) => {
     window.open(imageUrl, '_blank');
+  };
+
+  // Handlers for lifecycle actions
+  const handleTakeAction = async () => {
+    try {
+      setActionLoading(true);
+      await apiService.takeAction(report.report_id);
+      toast.success('Authorities have started taking action');
+      // Refresh to pick up updated status
+      window.location.reload();
+    } catch (err: any) {
+      console.error('Take action failed', err);
+      toast.error(err?.message || 'Failed to take action');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleMarkResolved = async () => {
+    try {
+      setActionLoading(true);
+      await apiService.markResolved(report.report_id);
+      toast.success('Report marked as resolved');
+      window.location.reload();
+    } catch (err: any) {
+      console.error('Mark resolved failed', err);
+      toast.error(err?.message || 'Failed to mark resolved');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   return (
@@ -507,6 +538,41 @@ export const EnhancedReportDetailsModal = ({ report, isOpen, onClose }: Enhanced
                   ✅ This report has been resolved and action has been completed.
                 </p>
               )}
+              {/* Action buttons: authority -> Take Action, owner -> Mark as Resolved */}
+              <div className="mt-3 flex items-center space-x-2">
+                {(() => {
+                  // Determine current user from localStorage (frontend auth store)
+                  try {
+                    if (typeof window !== 'undefined') {
+                      const stored = localStorage.getItem('user');
+                      const currentUser = stored ? JSON.parse(stored) : null;
+                      const role = (currentUser?.role || '').toLowerCase();
+                      const authorityRoles = ['state_chairman', 'district_chairman', 'nagar_panchayat_chairman', 'village_sarpanch'];
+
+                      // Authority 'Take Action' button
+                      if (authorityRoles.includes(role) && !['under_investigation', 'resolved', 'discarded'].includes(report.status)) {
+                        return (
+                          <Button size="sm" onClick={handleTakeAction} disabled={actionLoading}>
+                            Take Action
+                          </Button>
+                        );
+                      }
+
+                      // Citizen 'Mark as Resolved' button (only report owner)
+                      if (report.status === 'under_investigation' && currentUser && (currentUser as any).email === report.reported_by.email) {
+                        return (
+                          <Button size="sm" onClick={handleMarkResolved} disabled={actionLoading}>
+                            Mark as Resolved
+                          </Button>
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    // ignore
+                  }
+                  return null;
+                })()}
+              </div>
             </div>
           </div>
 
