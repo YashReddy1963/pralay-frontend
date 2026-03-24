@@ -241,6 +241,33 @@ let district = rawDistrict
     }
   };
 
+  // Generate SMS payload with better handling of missing/invalid location data
+  const generateSMSPayload = () => {
+    const [lat, lng] = formData.location.split(',').map(coord => coord?.trim());
+    
+    return `PRALAY|${formData.type}|${lat || 'NA'},${lng || 'NA'}|${formData.description.slice(0, 100)}`;
+  };
+
+  const sendViaSMS = () => {
+    if (!formData.type || !formData.description) {
+      toast({
+        title: "Incomplete form",
+        description: "Fill hazard type and description first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const message = generateSMSPayload();
+
+    // Replace with authority number
+    const authorityNumber = "7276606369"; 
+
+    const smsURL = `sms:${authorityNumber}?body=${encodeURIComponent(message)}`;
+
+    window.location.href = smsURL;
+  };
+
   const getCurrentLocation = () => {
     if ("geolocation" in navigator) {
       // Show loading state immediately
@@ -2645,6 +2672,16 @@ const runFormVerification = async () => {
             </div>
 
             {/* Submit Button */}
+            {!navigator.onLine && (
+              <Button
+                type="button"
+                variant="destructive"
+                className="w-full font-semibold py-3 text-lg"
+                onClick={sendViaSMS}
+              >
+                🚨 Send Emergency SMS
+              </Button>
+            )}
             <Button
               type="submit"
               className="w-full bg-gradient-sunset text-white font-semibold py-3 text-lg"
@@ -2672,6 +2709,7 @@ const runFormVerification = async () => {
                 </>
               )}
             </Button>
+
           </form>
         </CardContent>
       </Card>

@@ -7,7 +7,7 @@ const dbPromise = idb.openDB('pralay-offline-db', 1, {
   upgrade(db) {
     if (!db.objectStoreNames.contains('reports')) {
       db.createObjectStore('reports', { keyPath: 'id' });
-    }
+    } 
   },
 });
 
